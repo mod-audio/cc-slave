@@ -61,8 +61,8 @@ cc_device_t *cc_device_new(const char *name, const char *uri)
     cc_device_t *device = &g_devices[g_devices_count];
 
     // create device URI and label
-    device->uri = string_create(uri);
-    device->label = string_create(name);
+    cstr_create(uri, &device->uri);
+    cstr_create(name, &device->label);
 
     // create a list of actuators
     device->actuators = &g_actuators[g_devices_count * CC_MAX_ACTUATORS];

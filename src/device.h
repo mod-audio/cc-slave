@@ -39,7 +39,7 @@ extern "C"
 */
 
 typedef struct cc_device_t {
-    string_t *uri, *label;
+    cstr_t uri, label;
     cc_handshake_t *handshake;
     cc_actuator_t **actuators;
     unsigned int actuators_count;

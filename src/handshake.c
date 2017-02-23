@@ -51,7 +51,7 @@ static cc_handshake_t g_handshake;
 ****************************************************************************************************
 */
 
-cc_handshake_t *cc_handshake_generate(string_t *uri)
+cc_handshake_t *cc_handshake_generate(cstr_t *uri)
 {
     cc_handshake_t *handshake = &g_handshake;
 

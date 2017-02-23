@@ -31,10 +31,10 @@
 ****************************************************************************************************
 */
 
-typedef struct string_t {
+typedef struct cstr_t {
     uint8_t size;
-    char *text;
-} string_t;
+    const char *text;
+} cstr_t;
 
 typedef struct str16_t {
     uint8_t size;
@@ -60,10 +60,8 @@ typedef struct version_t {
 */
 uint8_t crc8(const uint8_t *data, uint32_t len);
 
-string_t *string_create(const char *str);
-int string_serialize(const string_t *str, uint8_t *buffer);
-string_t *string_deserialize(const uint8_t *data, uint32_t *written);
-void string_destroy(string_t *str);
+int cstr_create(const char *str, cstr_t *dest);
+int cstr_serialize(const cstr_t *str, uint8_t *buffer);
 
 int str16_create(const char *str, str16_t *dest);
 int str16_serialize(const str16_t *str, uint8_t *buffer);

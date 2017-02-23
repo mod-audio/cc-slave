@@ -145,7 +145,7 @@ int cc_msg_builder(int command, const void *data_struct, cc_msg_t *msg)
         const cc_handshake_t *handshake = data_struct;
 
         // serialize uri
-        pdata += string_serialize(handshake->uri, pdata);
+        pdata += cstr_serialize(handshake->uri, pdata);
 
         // random id
         uint8_t *pvalue = (uint8_t *) &handshake->random_id;
@@ -166,7 +166,7 @@ int cc_msg_builder(int command, const void *data_struct, cc_msg_t *msg)
         const cc_device_t *device = data_struct;
 
         // serialize label
-        pdata += string_serialize(device->label, pdata);
+        pdata += cstr_serialize(&device->label, pdata);
 
         // number of actuators
         *pdata++ = device->actuators_count;

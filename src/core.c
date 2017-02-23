@@ -151,7 +151,7 @@ static void parser(cc_handle_t *handle)
             if (sync_cycle == CC_SYNC_HANDSHAKE_CYCLE)
             {
                 // generate handshake
-                device->handshake = cc_handshake_generate(device->uri);
+                device->handshake = cc_handshake_generate(&device->uri);
 
                 // build and send handshake message
                 cc_msg_builder(CC_CMD_HANDSHAKE, device->handshake, handle->msg_tx);

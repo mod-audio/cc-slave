@@ -5,7 +5,6 @@
 ****************************************************************************************************
 */
 
-#include <stdlib.h>
 #include <string.h>
 #include "utils.h"
 
@@ -99,70 +98,20 @@ uint8_t crc8(const uint8_t *data, uint32_t len)
     return crc ^ 0xff;
 }
 
-string_t *string_create(const char *str)
+int cstr_create(const char *str, cstr_t *dest)
 {
-    string_t *obj = malloc(sizeof(string_t));
+    dest->text = str;
+    dest->size = strlen(str);
 
-    if (obj)
-    {
-        obj->size = strlen(str);
-        obj->text = malloc(obj->size + 1);
-        if (obj->text)
-        {
-            strcpy(obj->text, str);
-        }
-        else
-        {
-            free(obj);
-            obj = NULL;
-        }
-    }
-
-    return obj;
+    return dest->size;
 }
 
-int string_serialize(const string_t *str, uint8_t *buffer)
+int cstr_serialize(const cstr_t *str, uint8_t *buffer)
 {
     buffer[0] = str->size;
     memcpy(&buffer[1], str->text, str->size);
 
     return (str->size + 1);
-}
-
-string_t *string_deserialize(const uint8_t *data, uint32_t *written)
-{
-    string_t *str = malloc(sizeof(string_t));
-    *written = 0;
-
-    if (str)
-    {
-        str->size = *data++;
-        str->text = malloc(str->size + 1);
-        if (str->text)
-        {
-            memcpy(str->text, (char *) data, str->size);
-            str->text[str->size] = 0;
-            *written = str->size + 1;
-        }
-        else
-        {
-            free(str);
-            str = NULL;
-        }
-    }
-
-    return str;
-}
-
-void string_destroy(string_t *str)
-{
-    if (str)
-    {
-        if (str->text)
-            free(str->text);
-
-        free(str);
-    }
 }
 
 int str16_create(const char *str, str16_t *dest)
