@@ -33,6 +33,8 @@ extern "C"
 #define CC_PROTOCOL_MAJOR       0
 #define CC_PROTOCOL_MINOR       0
 
+#define CC_BAUD_RATE       115200
+
 
 /*
 ****************************************************************************************************
