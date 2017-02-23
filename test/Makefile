@@ -29,9 +29,9 @@ OBJ_COMMON = $(SRC_COMMON:.c=.o)
 OBJ = $(OBJ_TESTS) $(OBJ_COMMON)
 OUTPUTS = $(SRC_TESTS:.c=.bin)
 
-all: $(OUTPUTS)
+all: $(OBJ) $(OUTPUTS)
 
-%.bin: $(OBJ)
+%.bin: $(OBJ_TESTS)
 	$(CC) $(@:.bin=.o) $(OBJ_COMMON) $(LDFLAGS) -o $@ $(LIBS)
 
 %.o: %.c
