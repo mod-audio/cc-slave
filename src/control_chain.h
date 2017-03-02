@@ -40,12 +40,17 @@ extern "C"
 */
 
 #ifndef CC_USE_EXTERNAL_CONFIG
-// maximum number of devices that can created
+// maximum number of devices that can be created
 #define CC_MAX_DEVICES      1
-// maximum number of actuators that can created per device
+// maximum number of actuators that can be created per device
 #define CC_MAX_ACTUATORS    1
-// maximum number of assignments that can created per actuator
+// maximum number of assignments that can be created per actuator
 #define CC_MAX_ASSIGNMENTS  1
+
+// define firmware version
+#define CC_FIRMWARE_MAJOR   0
+#define CC_FIRMWARE_MINOR   0
+#define CC_FIRMWARE_MICRO   0
 #endif
 
 
@@ -85,6 +90,11 @@ void cc_parse(const cc_data_t *received);
 *       CONFIGURATION ERRORS
 ****************************************************************************************************
 */
+
+#if !defined(CC_FIRMWARE_MAJOR) && !defined(CC_FIRMWARE_MINOR) && !defined(CC_FIRMWARE_MICRO)
+#error "The macros CC_FIRMWARE_MAJOR, CC_FIRMWARE_MINOR and CC_FIRMWARE_MICRO must to be defined"
+#endif
+
 
 #ifdef __cplusplus
 }

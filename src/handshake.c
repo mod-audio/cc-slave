@@ -67,9 +67,9 @@ cc_handshake_t *cc_handshake_generate(cstr_t *uri)
     handshake->protocol.micro = 0;
 
     // firmware version
-    handshake->firmware.major = 0;
-    handshake->firmware.minor = 0;
-    handshake->firmware.micro = 0;
+    handshake->firmware.major = CC_FIRMWARE_MAJOR;
+    handshake->firmware.minor = CC_FIRMWARE_MINOR;
+    handshake->firmware.micro = CC_FIRMWARE_MICRO;
 
     return handshake;
 }
