@@ -27,10 +27,16 @@ extern "C"
 ****************************************************************************************************
 */
 
+// protocol version
 #define CC_PROTOCOL_MAJOR       0
-#define CC_PROTOCOL_MINOR       0
+#define CC_PROTOCOL_MINOR       1
 
+// define serial communication baud rate
 #define CC_BAUD_RATE       115200
+
+// define versions as strings
+#define CC_PROTOCOL_VERSION VERSION2_STR(CC_PROTOCOL_MAJOR, CC_PROTOCOL_MINOR)
+#define CC_FIRMWARE_VERSION VERSION3_STR(CC_FIRMWARE_MAJOR, CC_FIRMWARE_MINOR, CC_FIRMWARE_MICRO)
 
 
 /*
