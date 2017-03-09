@@ -45,6 +45,8 @@ extern "C"
 void timer_init(void (*callback)(void));
 void timer_set(uint32_t time_ms);
 
+void delay_us(uint32_t time_us);
+
 
 /*
 ****************************************************************************************************

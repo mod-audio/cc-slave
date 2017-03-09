@@ -4,6 +4,7 @@
 ****************************************************************************************************
 */
 
+#include <stdlib.h>
 #include "control_chain.h"
 #include "handshake.h"
 
@@ -58,8 +59,8 @@ cc_handshake_t *cc_handshake_generate(cstr_t *uri)
     // uri
     handshake->uri = uri;
 
-    // TODO: generate random number
-    handshake->random_id = 0xABCD;
+    // generate random number
+    handshake->random_id = rand();
 
     // protocol version
     handshake->protocol.major = CC_PROTOCOL_MAJOR;
