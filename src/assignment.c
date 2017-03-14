@@ -73,6 +73,7 @@ void cc_assignment_add(cc_assignment_t *assignment)
         cc_assignment_t *cache = &g_assignments_cache[i];
         if (cache->id == -1)
         {
+            // copy values
             cache->id = assignment->id;
             cache->actuator_id = assignment->actuator_id;
             cache->value = assignment->value;
@@ -80,9 +81,17 @@ void cc_assignment_add(cc_assignment_t *assignment)
             cache->max = assignment->max;
             cache->mode = assignment->mode;
             cache->steps = assignment->steps;
+
+            // copy strings if supported
+#ifndef CC_STRING_NOT_SUPPORTED
             memcpy(&cache->label, &assignment->label, sizeof(str16_t));
             memcpy(&cache->unit, &assignment->unit, sizeof(str16_t));
+#endif
+
+            // add assignment to list
             lili_push(g_assignments, cache);
+
+            // connect assignment to actuator
             cc_actuator_map(cache);
 
             break;

@@ -102,7 +102,12 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
         assignment->actuator_id = *pdata++;
 
         // assignment label
+#ifdef CC_STRING_NOT_SUPPORTED
+        uint8_t str_size = *pdata++;
+        pdata += str_size;
+#else
         pdata += str16_deserialize(pdata, &assignment->label);
+#endif
 
         // value, min, max, def
         pdata += bytes_to_float(pdata, &assignment->value);
@@ -123,7 +128,12 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
         *psteps++ = *pdata++;
 
         // unit
+#ifdef CC_STRING_NOT_SUPPORTED
+        str_size = *pdata++;
+        pdata += str_size;
+#else
         pdata += str16_deserialize(pdata, &assignment->unit);
+#endif
     }
     else if (msg->command == CC_CMD_UNASSIGNMENT)
     {

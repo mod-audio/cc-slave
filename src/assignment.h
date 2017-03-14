@@ -44,10 +44,12 @@ typedef lili_t cc_assignments_t;
 
 typedef struct cc_assignment_t {
     int id, actuator_id;
-    str16_t label, unit;
     float value, min, max, def;
     uint32_t mode;
     uint16_t steps;
+#ifndef CC_STRING_NOT_SUPPORTED
+    str16_t label, unit;
+#endif
 } cc_assignment_t;
 
 
