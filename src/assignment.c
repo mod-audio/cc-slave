@@ -6,8 +6,6 @@
 
 #include <string.h>
 #include "control_chain.h"
-#include "assignment.h"
-#include "device.h"
 
 
 /*
@@ -39,8 +37,7 @@
 ****************************************************************************************************
 */
 
-static cc_assignments_t *g_assignments = 0;
-static cc_assignment_t g_assignments_cache[MAX_ASSIGNMENTS];
+static cc_assignment_t g_assignments[MAX_ASSIGNMENTS];
 
 
 /*
@@ -56,81 +53,55 @@ static cc_assignment_t g_assignments_cache[MAX_ASSIGNMENTS];
 ****************************************************************************************************
 */
 
-void cc_assignment_add(cc_assignment_t *assignment)
+cc_assignment_t *cc_assignment_new(void)
 {
-    // initialize assignments list and cache
-    if (!g_assignments)
+    static int assignments_initialized;
+    if (!assignments_initialized)
     {
-        g_assignments = lili_create();
-
         for (int i = 0; i < MAX_ASSIGNMENTS; i++)
-            g_assignments_cache[i].id = -1;
+            g_assignments[i].id = -1;
+
+        assignments_initialized = 1;
     }
 
-    // search for unused assignments
     for (int i = 0; i < MAX_ASSIGNMENTS; i++)
     {
-        cc_assignment_t *cache = &g_assignments_cache[i];
-        if (cache->id == -1)
+        cc_assignment_t *assignment = &g_assignments[i];
+
+        if (assignment->id == -1)
         {
-            // copy values
-            cache->id = assignment->id;
-            cache->actuator_id = assignment->actuator_id;
-            cache->value = assignment->value;
-            cache->min = assignment->min;
-            cache->max = assignment->max;
-            cache->mode = assignment->mode;
-            cache->steps = assignment->steps;
-
-            // copy strings if supported
-#ifndef CC_STRING_NOT_SUPPORTED
-            memcpy(&cache->label, &assignment->label, sizeof(str16_t));
-            memcpy(&cache->unit, &assignment->unit, sizeof(str16_t));
-#endif
-
-            // add assignment to list
-            lili_push(g_assignments, cache);
-
-            // connect assignment to actuator
-            cc_actuator_map(cache);
-
-            break;
+            assignment->id = 0;
+            return assignment;
         }
     }
+
+    return 0;
 }
 
-int cc_assignment_remove(int assignment_id)
+int cc_assignment_delete(int assignment_id)
 {
-    if (!g_assignments)
-        return -1;
-
-    int index = 0;
-    LILI_FOREACH(g_assignments, node)
+    for (int i = 0; i < MAX_ASSIGNMENTS; i++)
     {
-        cc_assignment_t *assignment = node->data;
-        if (assignment_id == assignment->id || assignment_id == -1)
+        cc_assignment_t *assignment = &g_assignments[i];
+
+        if (assignment->id >= 0 && (assignment_id == assignment->id || assignment_id == -1))
         {
             cc_actuator_unmap(assignment);
-            lili_pop_from(g_assignments, index);
 
             assignment->id = -1;
+
+            // free list memory
+            options_list_destroy(assignment->list_items);
 
             if (assignment_id >= 0)
                 return assignment->actuator_id;
         }
-
-        index++;
     }
 
     return -1;
 }
 
-cc_assignments_t *cc_assignments(void)
-{
-    return g_assignments;
-}
-
 inline void cc_assignments_clear(void)
 {
-    cc_assignment_remove(-1);
+    cc_assignment_delete(-1);
 }

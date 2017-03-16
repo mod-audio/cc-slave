@@ -59,8 +59,8 @@ extern "C"
 */
 
 #define LILI_ONLY_STATIC_ALLOCATION
-#define LILI_MAX_LISTS      5
-#define LILI_MAX_NODES      50
+#define LILI_MAX_LISTS      2
+#define LILI_MAX_NODES      20
 
 
 /*

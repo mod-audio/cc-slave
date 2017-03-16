@@ -134,6 +134,25 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
 #else
         pdata += str16_deserialize(pdata, &assignment->unit);
 #endif
+
+        // default value of list count
+        assignment->list_count = 0;
+
+#ifndef CC_STRING_NOT_SUPPORTED
+        // list count
+        assignment->list_count = *pdata++;
+
+        // list items
+        assignment->list_items = options_list_create(assignment->list_count);
+
+        for (int i = 0; i < assignment->list_count; i++)
+        {
+            option_t *item = assignment->list_items[i];
+
+            pdata += str16_deserialize(pdata, &item->label);
+            pdata += bytes_to_float(pdata, &item->value);
+        }
+#endif
     }
     else if (msg->command == CC_CMD_UNASSIGNMENT)
     {

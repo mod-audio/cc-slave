@@ -66,6 +66,15 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
             {
                 assignment->value = 1.0;
             }
+            else if (assignment->mode & CC_MODE_OPTIONS)
+            {
+                assignment->list_index++;
+
+                if (assignment->list_index >= assignment->list_count)
+                    assignment->list_index = 0;
+
+                assignment->value = assignment->list_items[assignment->list_index]->value;
+            }
 
             return 1;
         }
@@ -135,6 +144,7 @@ cc_actuator_t *cc_actuator_new(cc_actuator_config_t *config)
 
 void cc_actuator_map(cc_assignment_t *assignment)
 {
+    // link assignment to actuator
     for (int i = 0; i < g_actuators_count; i++)
     {
         cc_actuator_t *actuator = &g_actuators[i];
@@ -142,6 +152,19 @@ void cc_actuator_map(cc_assignment_t *assignment)
         {
             actuator->assignment = assignment;
             break;
+        }
+    }
+
+    // initialize option list index
+    if (assignment->mode & CC_MODE_OPTIONS)
+    {
+        for (int i = 0; i < assignment->list_count; i++)
+        {
+            if (assignment->value == assignment->list_items[i]->value)
+            {
+                assignment->list_index = i;
+                break;
+            }
         }
     }
 }

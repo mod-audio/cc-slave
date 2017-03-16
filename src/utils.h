@@ -9,6 +9,7 @@
 */
 
 #include <stdint.h>
+#include "config.h"
 
 
 /*
@@ -30,6 +31,8 @@
 ****************************************************************************************************
 */
 
+#define OPTIONS_MAX_ITEMS   CC_MAX_OPTIONS_ITEMS
+
 
 /*
 ****************************************************************************************************
@@ -50,6 +53,11 @@ typedef struct str16_t {
 typedef struct version_t {
     uint8_t major, minor, micro;
 } version_t;
+
+typedef struct option_t {
+    str16_t label;
+    float value;
+} option_t;
 
 
 /*
@@ -74,6 +82,9 @@ int str16_serialize(const str16_t *str, uint8_t *buffer);
 int str16_deserialize(const uint8_t *data, str16_t *str);
 
 int bytes_to_float(const uint8_t *array, float *pvar);
+
+option_t **options_list_create(uint8_t items_count);
+void options_list_destroy(option_t **list);
 
 
 /*

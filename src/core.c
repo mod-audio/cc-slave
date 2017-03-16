@@ -225,11 +225,11 @@ static void parser(cc_handle_t *handle)
         }
         else if (msg_rx->command == CC_CMD_ASSIGNMENT)
         {
-            cc_assignment_t assignment;
-            cc_msg_parser(msg_rx, &assignment);
+            cc_assignment_t *assignment = cc_assignment_new();
+            cc_msg_parser(msg_rx, assignment);
 
-            cc_assignment_add(&assignment);
-            raise_event(handle, CC_EV_ASSIGNMENT, &assignment);
+            cc_actuator_map(assignment);
+            raise_event(handle, CC_EV_ASSIGNMENT, assignment);
 
             cc_msg_builder(CC_CMD_ASSIGNMENT, 0, handle->msg_tx);
             send(handle, handle->msg_tx);
@@ -239,7 +239,7 @@ static void parser(cc_handle_t *handle)
             uint8_t assignment_id;
             cc_msg_parser(msg_rx, &assignment_id);
 
-            int actuator_id = cc_assignment_remove(assignment_id);
+            int actuator_id = cc_assignment_delete(assignment_id);
             raise_event(handle, CC_EV_UNASSIGNMENT, &actuator_id);
 
             cc_msg_builder(CC_CMD_UNASSIGNMENT, 0, handle->msg_tx);

@@ -1,4 +1,3 @@
-
 /*
 ****************************************************************************************************
 *       INCLUDE FILES
@@ -6,6 +5,7 @@
 */
 
 #include <string.h>
+#include <stdlib.h>
 #include "utils.h"
 
 
@@ -158,4 +158,40 @@ int bytes_to_float(const uint8_t *array, float *pvar)
     *pvar = aux.value;
 
     return (sizeof(float));
+}
+
+option_t **options_list_create(uint8_t items_count)
+{
+    if (items_count == 0)
+        return 0;
+
+    static option_t all_items[OPTIONS_MAX_ITEMS];
+    option_t **list = malloc((items_count + 1) * sizeof(option_t *));
+
+    if (list)
+    {
+        for (int i = 0, j = 0; i < OPTIONS_MAX_ITEMS; i++)
+        {
+            if (all_items[i].label.size == 0)
+            {
+                all_items[i].label.size = 0xFF;
+                list[j++] = &all_items[i];
+            }
+        }
+
+        list[items_count] = 0;
+    }
+
+    return list;
+}
+
+void options_list_destroy(option_t **list)
+{
+    if (list)
+    {
+        for (int i = 0; list[i]; i++)
+            list[i]->label.size = 0;
+
+        free(list);
+    }
 }

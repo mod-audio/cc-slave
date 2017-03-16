@@ -13,7 +13,6 @@ extern "C"
 */
 
 #include <stdint.h>
-#include "lili.h"
 #include "utils.h"
 
 
@@ -25,6 +24,7 @@ extern "C"
 
 #define CC_MODE_TOGGLE  0x01
 #define CC_MODE_TRIGGER 0x02
+#define CC_MODE_OPTIONS 0x04
 
 
 /*
@@ -40,14 +40,15 @@ extern "C"
 ****************************************************************************************************
 */
 
-typedef lili_t cc_assignments_t;
-
 typedef struct cc_assignment_t {
     int id, actuator_id;
     float value, min, max, def;
     uint32_t mode;
     uint16_t steps;
+    uint8_t list_count;
 #ifndef CC_STRING_NOT_SUPPORTED
+    uint8_t list_index;
+    option_t **list_items;
     str16_t label, unit;
 #endif
 } cc_assignment_t;
@@ -59,14 +60,10 @@ typedef struct cc_assignment_t {
 ****************************************************************************************************
 */
 
-// add an assignment to the assignments list
-void cc_assignment_add(cc_assignment_t *assignment);
-// remove an assignment from the assignments list and returns the actuator it was assigned
-int cc_assignment_remove(int assignment_id);
-// set callback to assignments events
-void cc_assignments_callback(void (*assignments_cb)(void *arg));
-// return the assignments list
-cc_assignments_t *cc_assignments(void);
+// create a new assignment
+cc_assignment_t *cc_assignment_new(void);
+// delete an assignment
+int cc_assignment_delete(int assignment_id);
 // remove all assignments
 void cc_assignments_clear(void);
 
