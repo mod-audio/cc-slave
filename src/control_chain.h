@@ -14,11 +14,6 @@ extern "C"
 
 #include <stdint.h>
 #include "config.h"
-#include "device.h"
-#include "handshake.h"
-#include "actuator.h"
-#include "update.h"
-#include "msg.h"
 
 
 /*
@@ -51,11 +46,13 @@ extern "C"
 #ifdef CC_USE_INTERNAL_CONFIG
 
 // maximum number of devices that can be created
-#define CC_MAX_DEVICES      1
+#define CC_MAX_DEVICES          1
 // maximum number of actuators that can be created per device
-#define CC_MAX_ACTUATORS    1
+#define CC_MAX_ACTUATORS        1
 // maximum number of assignments that can be created per actuator
-#define CC_MAX_ASSIGNMENTS  1
+#define CC_MAX_ASSIGNMENTS      1
+// maximum number of options items that can be created per device
+#define CC_MAX_OPTIONS_ITEMS    8
 
 // disable string support, any string receive will be ignored
 // useful for devices with few memory
@@ -67,6 +64,14 @@ extern "C"
 #define CC_FIRMWARE_MICRO   0
 
 #endif
+
+// these includes have to be added after the configuration
+#include "device.h"
+#include "handshake.h"
+#include "actuator.h"
+#include "update.h"
+#include "msg.h"
+#include "utils.h"
 
 
 /*

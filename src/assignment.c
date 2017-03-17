@@ -90,8 +90,10 @@ int cc_assignment_delete(int assignment_id)
 
             assignment->id = -1;
 
+#ifndef CC_STRING_NOT_SUPPORTED
             // free list memory
             options_list_destroy(assignment->list_items);
+#endif
 
             if (assignment_id >= 0)
                 return assignment->actuator_id;

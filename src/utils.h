@@ -31,7 +31,9 @@
 ****************************************************************************************************
 */
 
+#ifdef CC_MAX_OPTIONS_ITEMS
 #define OPTIONS_MAX_ITEMS   CC_MAX_OPTIONS_ITEMS
+#endif
 
 
 /*

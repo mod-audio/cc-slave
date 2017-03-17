@@ -58,14 +58,20 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
         {
             actuator->lock = 1;
 
+            // toggle mode
             if (assignment->mode & CC_MODE_TOGGLE)
             {
                 assignment->value = 1.0 - assignment->value;
             }
+
+            // trigger mode
             else if (assignment->mode & CC_MODE_TRIGGER)
             {
                 assignment->value = 1.0;
             }
+
+            // option list mode (requires string support)
+#ifndef CC_STRING_NOT_SUPPORTED
             else if (assignment->mode & CC_MODE_OPTIONS)
             {
                 assignment->list_index++;
@@ -75,6 +81,7 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
 
                 assignment->value = assignment->list_items[assignment->list_index]->value;
             }
+#endif
 
             return 1;
         }
@@ -155,6 +162,7 @@ void cc_actuator_map(cc_assignment_t *assignment)
         }
     }
 
+#ifndef CC_STRING_NOT_SUPPORTED
     // initialize option list index
     if (assignment->mode & CC_MODE_OPTIONS)
     {
@@ -167,6 +175,7 @@ void cc_actuator_map(cc_assignment_t *assignment)
             }
         }
     }
+#endif
 }
 
 void cc_actuator_unmap(cc_assignment_t *assignment)
