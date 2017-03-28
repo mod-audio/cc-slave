@@ -31,7 +31,7 @@
 ****************************************************************************************************
 */
 
-#ifdef CC_MAX_OPTIONS_ITEMS
+#if !defined(CC_STRING_NOT_SUPPORTED) && CC_MAX_OPTIONS_ITEMS > 0
 #define OPTIONS_MAX_ITEMS   CC_MAX_OPTIONS_ITEMS
 #endif
 

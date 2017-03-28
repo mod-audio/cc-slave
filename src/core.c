@@ -23,6 +23,9 @@
 
 #define I_AM_ALIVE_PERIOD   50      // in sync cycles
 
+#define RX_BUFFER_SIZE      64 + (CC_MAX_OPTIONS_ITEMS * 20)
+#define TX_BUFFER_SIZE      128
+
 
 /*
 ****************************************************************************************************
@@ -293,10 +296,13 @@ static void timer_callback(void)
 
 void cc_init(void (*response_cb)(void *arg), void (*events_cb)(void *arg))
 {
+    static uint8_t rx_buffer[RX_BUFFER_SIZE];
+    static uint8_t tx_buffer[TX_BUFFER_SIZE];
+
     g_cc_handle.response_cb = response_cb;
     g_cc_handle.events_cb = events_cb;
-    g_cc_handle.msg_rx = cc_msg_new();
-    g_cc_handle.msg_tx = cc_msg_new();
+    g_cc_handle.msg_rx = cc_msg_new(rx_buffer);
+    g_cc_handle.msg_tx = cc_msg_new(tx_buffer);
 
     timer_init(timer_callback);
 }

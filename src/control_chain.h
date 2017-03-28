@@ -63,6 +63,24 @@ extern "C"
 #define CC_FIRMWARE_MINOR   0
 #define CC_FIRMWARE_MICRO   0
 
+// CC_USE_INTERNAL_CONFIG
+#endif
+
+// define new macros according configuration
+// string supported
+#ifndef CC_STRING_NOT_SUPPORTED
+#define CC_STRING_SUPPORTED
+#endif
+
+// make sure options list is disabled if string is not supported
+#if defined(CC_STRING_NOT_SUPPORTED) || !defined(CC_MAX_OPTIONS_ITEMS)
+#undef CC_MAX_OPTIONS_ITEMS
+#define CC_MAX_OPTIONS_ITEMS 0
+#endif
+
+// options list supported
+#if CC_MAX_OPTIONS_ITEMS > 0
+#define CC_OPTIONS_LIST_SUPPORTED
 #endif
 
 // these includes have to be added after the configuration

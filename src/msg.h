@@ -53,7 +53,7 @@ typedef struct cc_msg_t {
 ****************************************************************************************************
 */
 
-cc_msg_t *cc_msg_new(void);
+cc_msg_t *cc_msg_new(uint8_t *buffer);
 
 int cc_msg_parser(const cc_msg_t *msg, void *data_struct);
 int cc_msg_builder(int command, const void *data_struct, cc_msg_t *msg);

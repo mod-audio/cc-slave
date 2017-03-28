@@ -16,7 +16,7 @@
 */
 
 #ifndef OPTIONS_MAX_ITEMS
-#define OPTIONS_MAX_ITEMS 8
+#define OPTIONS_MAX_ITEMS 0
 #endif
 
 
@@ -164,6 +164,7 @@ int bytes_to_float(const uint8_t *array, float *pvar)
     return (sizeof(float));
 }
 
+#if OPTIONS_MAX_ITEMS > 0
 option_t **options_list_create(uint8_t items_count)
 {
     if (items_count == 0)
@@ -199,3 +200,4 @@ void options_list_destroy(option_t **list)
         free(list);
     }
 }
+#endif

@@ -4,6 +4,7 @@
 ****************************************************************************************************
 */
 
+#include "control_chain.h"
 #include "msg.h"
 #include "handshake.h"
 #include "device.h"
@@ -16,8 +17,7 @@
 ****************************************************************************************************
 */
 
-#define MAX_INSTANCES       2
-#define DATA_BUFFER_SIZE    128
+#define MSG_MAX_INSTANCES   2
 
 
 /*
@@ -32,12 +32,6 @@
 *       INTERNAL DATA TYPES
 ****************************************************************************************************
 */
-
-struct cc_msg_manager_t {
-    int count;
-    cc_msg_t instances[MAX_INSTANCES];
-    uint8_t buffers[MAX_INSTANCES][DATA_BUFFER_SIZE];
-} g_msg_man;
 
 
 /*
@@ -60,14 +54,19 @@ struct cc_msg_manager_t {
 ****************************************************************************************************
 */
 
-cc_msg_t *cc_msg_new(void)
+cc_msg_t *cc_msg_new(uint8_t *buffer)
 {
-    cc_msg_t *msg;
+    static int count;
+    static cc_msg_t msg_cache[MSG_MAX_INSTANCES];
 
-    int i = g_msg_man.count++;
-    msg = &g_msg_man.instances[i];
-    msg->header = g_msg_man.buffers[i];
-    msg->data = &msg->header[CC_MSG_HEADER_SIZE];
+    if (count >= MSG_MAX_INSTANCES)
+        return 0;
+
+    cc_msg_t *msg = &msg_cache[count++];
+
+    // set buffers
+    msg->header = buffer;
+    msg->data = &buffer[CC_MSG_HEADER_SIZE];
 
     return msg;
 }
@@ -103,9 +102,11 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
 
         // assignment label
 #ifdef CC_STRING_NOT_SUPPORTED
+        // skip label
         uint8_t str_size = *pdata++;
         pdata += str_size;
 #else
+        // read label
         pdata += str16_deserialize(pdata, &assignment->label);
 #endif
 
@@ -129,16 +130,18 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
 
         // unit
 #ifdef CC_STRING_NOT_SUPPORTED
+        // skip unit
         str_size = *pdata++;
         pdata += str_size;
 #else
+        // read unit
         pdata += str16_deserialize(pdata, &assignment->unit);
 #endif
 
         // default value of list count
         assignment->list_count = 0;
 
-#ifndef CC_STRING_NOT_SUPPORTED
+#ifdef CC_OPTIONS_LIST_SUPPORTED
         // list count
         assignment->list_count = *pdata++;
 

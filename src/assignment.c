@@ -90,7 +90,7 @@ int cc_assignment_delete(int assignment_id)
 
             assignment->id = -1;
 
-#ifndef CC_STRING_NOT_SUPPORTED
+#ifdef CC_OPTIONS_LIST_SUPPORTED
             // free list memory
             options_list_destroy(assignment->list_items);
 #endif
