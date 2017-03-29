@@ -42,3 +42,8 @@ void timer_set(uint32_t time_ms)
     tval.it_value.tv_usec = 1000 * time_ms;
     setitimer(ITIMER_REAL, &tval, NULL);
 }
+
+void delay_us(uint32_t time_us)
+{
+    for (volatile uint32_t i = 0; i < time_us; i++);
+}
