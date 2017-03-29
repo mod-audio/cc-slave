@@ -8,6 +8,10 @@
 #include <stdlib.h>
 #include "utils.h"
 
+#ifdef __AVR__
+#include <avr/pgmspace.h>
+#endif
+
 
 /*
 ****************************************************************************************************
@@ -19,6 +23,10 @@
 #define OPTIONS_MAX_ITEMS 0
 #endif
 
+#ifndef PROGMEM
+#define PROGMEM
+#endif
+
 
 /*
 ****************************************************************************************************
@@ -26,7 +34,7 @@
 ****************************************************************************************************
 */
 
-static uint8_t crc8_table[] = {
+static const PROGMEM uint8_t crc8_table[] = {
     0x00, 0x3e, 0x7c, 0x42, 0xf8, 0xc6, 0x84, 0xba, 0x95, 0xab, 0xe9, 0xd7,
     0x6d, 0x53, 0x11, 0x2f, 0x4f, 0x71, 0x33, 0x0d, 0xb7, 0x89, 0xcb, 0xf5,
     0xda, 0xe4, 0xa6, 0x98, 0x22, 0x1c, 0x5e, 0x60, 0x9e, 0xa0, 0xe2, 0xdc,
@@ -96,7 +104,11 @@ uint8_t crc8(const uint8_t *data, uint32_t len)
     end = data + len;
 
     do {
+#ifdef __AVR__
+        crc = pgm_read_byte(&crc8_table[crc ^ *data++]);
+#else
         crc = crc8_table[crc ^ *data++];
+#endif
     } while (data < end);
 
     return crc ^ 0xff;
