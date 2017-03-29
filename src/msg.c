@@ -228,8 +228,7 @@ int cc_msg_builder(int command, const void *data_struct, cc_msg_t *msg)
     }
     else if (command == CC_CMD_DATA_UPDATE)
     {
-        cc_updates_t *updates = cc_updates();
-        *pdata++ = updates->count;
+        *pdata++ = cc_updates_count();
 
         // serialize updates data
         cc_update_t update;

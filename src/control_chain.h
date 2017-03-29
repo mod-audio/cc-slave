@@ -58,6 +58,9 @@ extern "C"
 // useful for devices with few memory
 #define CC_STRING_NOT_SUPPORTED
 
+// define the size of the queue used to store the updates before send them
+#define CC_UPDATES_FIFO_SIZE    10
+
 // define firmware version
 #define CC_FIRMWARE_MAJOR   0
 #define CC_FIRMWARE_MINOR   0

@@ -269,8 +269,7 @@ static void timer_callback(void)
     // cached in the main loop and the interrupt handler is only used to queue the message
     // (send command)
 
-    cc_updates_t *updates = cc_updates();
-    if (!updates || updates->count == 0)
+    if (cc_updates_count() == 0)
     {
         // the device cannot stay so long time without say hey to mod, it's very needy
         if (++sync_counter >= I_AM_ALIVE_PERIOD)

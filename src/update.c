@@ -5,6 +5,7 @@
 */
 
 #include "update.h"
+#include "control_chain.h"
 
 
 /*
@@ -13,7 +14,8 @@
 ****************************************************************************************************
 */
 
-#define MAX_UPDATES     10
+#define FIFO_IS_FULL(f)     ((f.head + 1) % CC_UPDATES_FIFO_SIZE == f.tail)
+#define FIFO_IS_EMPTY(f)    (f.head == f.tail)
 
 
 /*
@@ -29,6 +31,11 @@
 ****************************************************************************************************
 */
 
+typedef struct fifo_t {
+    cc_update_t updates[CC_UPDATES_FIFO_SIZE];
+    int head, tail;
+} fifo_t;
+
 
 /*
 ****************************************************************************************************
@@ -36,8 +43,7 @@
 ****************************************************************************************************
 */
 
-static cc_updates_t *g_updates = 0;
-static cc_update_t g_updates_cache[MAX_UPDATES];
+static fifo_t g_updates;
 
 
 /*
@@ -55,46 +61,27 @@ static cc_update_t g_updates_cache[MAX_UPDATES];
 
 void cc_update_push(const cc_update_t *update)
 {
-    // initialize update list and cache
-    if (!g_updates)
+    if (!FIFO_IS_FULL(g_updates))
     {
-        g_updates = lili_create();
+        int head = g_updates.head;
+        g_updates.updates[head].assignment_id = update->assignment_id;
+        g_updates.updates[head].value = update->value;
 
-        for (int i = 0; i < MAX_UPDATES; i++)
-            g_updates_cache[i].assignment_id = -1;
-    }
-
-    // search for unused update
-    for (int i = 0; i < MAX_UPDATES; i++)
-    {
-        cc_update_t *cache = &g_updates_cache[i];
-        if (cache->assignment_id == -1)
-        {
-            cache->assignment_id = update->assignment_id;
-            cache->value = update->value;
-            lili_push(g_updates, cache);
-            break;
-        }
+        // increase head
+        g_updates.head = (head + 1) % CC_UPDATES_FIFO_SIZE;
     }
 }
 
 int cc_update_pop(cc_update_t *update)
 {
-    if (!g_updates)
-        return 0;
-
-    cc_update_t *cache = lili_pop_front(g_updates);
-
-    if (cache)
+    if (!FIFO_IS_EMPTY(g_updates))
     {
-        if (update)
-        {
-            update->assignment_id = cache->assignment_id;
-            update->value = cache->value;
-        }
+        int tail = g_updates.tail;
+        update->assignment_id = g_updates.updates[tail].assignment_id;
+        update->value = g_updates.updates[tail].value;
 
-        // make cache position available again
-        cache->assignment_id = -1;
+        // increase tail
+        g_updates.tail = (tail + 1) % CC_UPDATES_FIFO_SIZE;
 
         return 1;
     }
@@ -102,12 +89,16 @@ int cc_update_pop(cc_update_t *update)
     return 0;
 }
 
-cc_updates_t *cc_updates(void)
+int cc_updates_count(void)
 {
-    return g_updates;
+    if (g_updates.head >= g_updates.tail)
+        return ((g_updates.head - g_updates.tail) % CC_UPDATES_FIFO_SIZE);
+
+    return CC_UPDATES_FIFO_SIZE - (g_updates.tail - g_updates.head);
 }
 
 void cc_updates_clear(void)
 {
-    while (cc_update_pop(0));
+    g_updates.head = 0;
+    g_updates.tail = 0;
 }
