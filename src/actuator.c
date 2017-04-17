@@ -94,28 +94,89 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
     return 0;
 }
 
+static int continuos_process(cc_actuator_t *actuator, cc_assignment_t *assignment)
+{
+    float actuator_value = *(actuator->value);
+
+    // check if actuator value has changed the minimum required value
+    float delta = (actuator->max + actuator->min) * 0.01;
+    if (fabs(actuator->last_value - actuator_value) < delta)
+        return 0;
+
+    // update value
+    actuator->last_value = actuator_value;
+
+    // toggle and trigger modes
+    if (assignment->mode & CC_MODE_TOGGLE || assignment->mode & CC_MODE_TRIGGER)
+    {
+        float middle = (actuator->max + actuator->min) / 2.0;
+
+        if (actuator_value >= middle)
+        {
+            assignment->value = 1.0;
+        }
+        else if (assignment->mode & CC_MODE_TOGGLE)
+        {
+            assignment->value = 0.0;
+        }
+        else
+        {
+            return 0;
+        }
+
+        return 1;
+    }
+
+    // option list mode
+#ifdef CC_OPTIONS_LIST_SUPPORTED
+    else if (assignment->mode & CC_MODE_OPTIONS)
+    {
+        float step = (actuator->max + actuator->min) / (float) assignment->list_count;
+
+        assignment->list_index = actuator_value / step;
+
+        if (assignment->list_index >= assignment->list_count)
+            assignment->list_index = assignment->list_count - 1;
+
+        assignment->value = assignment->list_items[assignment->list_index]->value;
+
+        return 1;
+    }
+#endif
+
+    float a, b;
+    a = (assignment->max - assignment->min) / (actuator->max - actuator->min);
+    b = assignment->min - a*actuator->min;
+
+    float value = a*actuator_value + b;
+
+    // real mode
+    if (assignment->mode & CC_MODE_REAL)
+    {
+        assignment->value = value;
+        return 1;
+    }
+
+    // integer mode
+    else if (assignment->mode & CC_MODE_INTEGER)
+    {
+        assignment->value = roundf(value);
+        return 1;
+    }
+
+    return 0;
+}
+
 static int update_assignment_value(cc_actuator_t *actuator, cc_assignment_t *assignment)
 {
     switch (actuator->type)
     {
         case CC_ACTUATOR_MOMENTARY:
             return momentary_process(actuator, assignment);
+
+        case CC_ACTUATOR_CONTINUOUS:
+            return continuos_process(actuator, assignment);
     }
-
-#if 0
-    float a, b;
-    a = (assignment->max - assignment->min) / (actuator->max - actuator->min);
-    b = assignment->min - a*actuator->min;
-
-    float value, actuator_value = *(actuator->value);
-    value = a*actuator_value + b;
-
-    if (abs(assignment->value - value) >= 0.0001)
-    {
-        assignment->value = value;
-        return 1;
-    }
-#endif
 
     return 0;
 }

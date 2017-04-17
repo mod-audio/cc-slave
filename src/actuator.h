@@ -51,7 +51,7 @@ typedef struct cc_actuator_t {
     int id, type, lock;
     str16_t name;
     volatile float *value;
-    float min, max;
+    float min, max, last_value;
     uint32_t supported_modes;
     int max_assignments;
     cc_assignment_t *assignment;
