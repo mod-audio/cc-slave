@@ -74,7 +74,7 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
             // trigger mode
             else if (assignment->mode & CC_MODE_TRIGGER)
             {
-                assignment->value = 1.0;
+                assignment->value = assignment->max;
             }
 
             // toggle mode
