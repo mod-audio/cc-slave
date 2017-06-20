@@ -69,10 +69,11 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
 
                 assignment->value = assignment->list_items[assignment->list_index]->value;
             }
+            else
 #endif
 
             // trigger mode
-            else if (assignment->mode & CC_MODE_TRIGGER)
+            if (assignment->mode & CC_MODE_TRIGGER)
             {
                 assignment->value = assignment->max;
             }
