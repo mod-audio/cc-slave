@@ -189,6 +189,11 @@ static void parser(cc_handle_t *handle)
                 handle->device_id = handshake.device_id;
                 handle->comm_state++;
             }
+            else
+            {
+                // as the random id doesn't match returns to previous state
+                handle->comm_state--;
+            }
         }
     }
     else if (handle->comm_state == WAITING_DEV_DESCRIPTOR)
