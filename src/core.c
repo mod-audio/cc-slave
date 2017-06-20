@@ -174,6 +174,8 @@ static void parser(cc_handle_t *handle)
     }
     else if (handle->comm_state == WAITING_HANDSHAKE)
     {
+        static int handshake_timeout;
+
         if (msg_rx->command == CC_CMD_HANDSHAKE)
         {
             cc_handshake_mod_t handshake;
@@ -188,12 +190,20 @@ static void parser(cc_handle_t *handle)
                 // TODO: handle channel
                 handle->device_id = handshake.device_id;
                 handle->comm_state++;
+                handshake_timeout = 0;
             }
             else
             {
                 // as the random id doesn't match returns to previous state
                 handle->comm_state--;
             }
+        }
+
+        // if handshake confirmation is not received returns to previous state
+        else if (++handshake_timeout >= 3)
+        {
+            handshake_timeout = 0;
+            handle->comm_state--;
         }
     }
     else if (handle->comm_state == WAITING_DEV_DESCRIPTOR)
