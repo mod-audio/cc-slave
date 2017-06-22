@@ -16,7 +16,7 @@
 */
 
 // step between generated random numbers in bytes
-#define RANDOM_STEP_BYTES   3
+#define RANDOM_STEP_BYTES   (CC_MSG_HEADER_SIZE + 2 + 7)
 
 // random generation boundaries
 #define RANDOM_MAX      5000
@@ -68,12 +68,9 @@ static cc_handshake_t g_handshake;
 ****************************************************************************************************
 */
 
-cc_handshake_t *cc_handshake_generate(cstr_t *uri)
+cc_handshake_t *cc_handshake_generate(void)
 {
     cc_handshake_t *handshake = &g_handshake;
-
-    // uri
-    handshake->uri = uri;
 
     // generate random number
     handshake->random_id = RANDOM_RANGE_STEP(RANDOM_MIN, RANDOM_MAX, RANDOM_STEP);

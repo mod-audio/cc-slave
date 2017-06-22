@@ -83,9 +83,9 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
         handshake->random_id = *((uint16_t *) pdata);
         pdata += sizeof(uint16_t);
 
+        // status, device id
         handshake->status = *pdata++;
         handshake->device_id = *pdata++;
-        handshake->channel = *pdata++;
     }
     if (msg->command == CC_CMD_DEV_CONTROL)
     {
@@ -176,9 +176,6 @@ int cc_msg_builder(int command, const void *data_struct, cc_msg_t *msg)
     {
         const cc_handshake_t *handshake = data_struct;
 
-        // serialize uri
-        pdata += cstr_serialize(handshake->uri, pdata);
-
         // random id
         uint8_t *pvalue = (uint8_t *) &handshake->random_id;
         *pdata++ = *pvalue++;
@@ -196,6 +193,9 @@ int cc_msg_builder(int command, const void *data_struct, cc_msg_t *msg)
     else if (command == CC_CMD_DEV_DESCRIPTOR)
     {
         const cc_device_t *device = data_struct;
+
+        // serialize uri
+        pdata += cstr_serialize(&device->uri, pdata);
 
         // serialize label
         pdata += cstr_serialize(&device->label, pdata);

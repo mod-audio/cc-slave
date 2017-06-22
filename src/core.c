@@ -154,7 +154,7 @@ static void parser(cc_handle_t *handle)
             if (sync_cycle == CC_SYNC_HANDSHAKE_CYCLE)
             {
                 // generate handshake
-                device->handshake = cc_handshake_generate(&device->uri);
+                device->handshake = cc_handshake_generate();
 
                 // build handshake message
                 cc_msg_builder(CC_CMD_HANDSHAKE, device->handshake, handle->msg_tx);
@@ -173,7 +173,7 @@ static void parser(cc_handle_t *handle)
     }
     else if (handle->comm_state == WAITING_HANDSHAKE)
     {
-        static int handshake_timeout;
+        static int handshake_attempts;
 
         if (msg_rx->command == CC_CMD_HANDSHAKE)
         {
@@ -189,20 +189,17 @@ static void parser(cc_handle_t *handle)
                 // TODO: handle channel
                 handle->device_id = handshake.device_id;
                 handle->comm_state++;
-                handshake_timeout = 0;
+                handshake_attempts = 0;
             }
             else
             {
-                // as the random id doesn't match returns to previous state
-                handle->comm_state--;
+                // if doesn't receive handshake reply in 3 attempts returns to previous state
+                if (++handshake_attempts >= 3)
+                {
+                    handshake_attempts = 0;
+                    handle->comm_state--;
+                }
             }
-        }
-
-        // if handshake confirmation is not received returns to previous state
-        else if (++handshake_timeout >= 3)
-        {
-            handshake_timeout = 0;
-            handle->comm_state--;
         }
     }
     else if (handle->comm_state == WAITING_DEV_DESCRIPTOR)
