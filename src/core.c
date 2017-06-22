@@ -159,11 +159,10 @@ static void parser(cc_handle_t *handle)
                 // build handshake message
                 cc_msg_builder(CC_CMD_HANDSHAKE, device->handshake, handle->msg_tx);
 
-                // generate a random delay before send the message
+                // use the random id value to delay the message before send it
                 // this delay should minimize the chance of handshake conflicting
                 // since multiple devices can be connected at the same time
-                uint16_t random_delay = device->handshake->random_id % 5000;
-                delay_us(random_delay);
+                delay_us(device->handshake->random_id);
 
                 // send message
                 send(handle, handle->msg_tx);

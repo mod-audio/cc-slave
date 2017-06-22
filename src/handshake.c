@@ -15,6 +15,22 @@
 ****************************************************************************************************
 */
 
+// step between generated random numbers in bytes
+#define RANDOM_STEP_BYTES   3
+
+// random generation boundaries
+#define RANDOM_MAX      5000
+#define RANDOM_MIN      100
+
+// convert step value from bytes to microseconds
+#define RANDOM_STEP     ((10 * 1000000 * RANDOM_STEP_BYTES)  / CC_BAUD_RATE)
+
+// macro to generate random number within a range
+#define RANDOM_RANGE(min, max)              ((rand() % max) + min)
+
+// macro to generate random number within a range and using a defined step
+#define RANDOM_RANGE_STEP(min, max, step)   (RANDOM_RANGE(min/step, max/step) * step)
+
 
 /*
 ****************************************************************************************************
@@ -60,7 +76,7 @@ cc_handshake_t *cc_handshake_generate(cstr_t *uri)
     handshake->uri = uri;
 
     // generate random number
-    handshake->random_id = rand();
+    handshake->random_id = RANDOM_RANGE_STEP(RANDOM_MIN, RANDOM_MAX, RANDOM_STEP);
 
     // protocol version
     handshake->protocol.major = CC_PROTOCOL_MAJOR;
