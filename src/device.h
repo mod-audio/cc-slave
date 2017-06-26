@@ -38,6 +38,9 @@ extern "C"
 ****************************************************************************************************
 */
 
+// device descriptor actions
+enum {CC_DEVICE_DESC_REQ, CC_DEVICE_DESC_ACK};
+
 typedef struct cc_device_t {
     cstr_t uri, label;
     cc_handshake_t *handshake;

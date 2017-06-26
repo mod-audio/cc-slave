@@ -165,6 +165,7 @@ static void parser(cc_handle_t *handle)
                 delay_us(device->handshake->random_id);
 
                 // send message
+                handle->device_id = BROADCAST_ADDRESS;
                 send(handle, handle->msg_tx);
 
                 handle->comm_state++;
@@ -173,7 +174,7 @@ static void parser(cc_handle_t *handle)
     }
     else if (handle->comm_state == WAITING_HANDSHAKE)
     {
-        static int handshake_attempts;
+        static int handshake_attempts, handshake_timeout;
 
         if (msg_rx->command == CC_CMD_HANDSHAKE)
         {
@@ -190,6 +191,7 @@ static void parser(cc_handle_t *handle)
                 handle->device_id = handshake.device_id;
                 handle->comm_state++;
                 handshake_attempts = 0;
+                handshake_timeout = 0;
             }
             else
             {
@@ -197,21 +199,45 @@ static void parser(cc_handle_t *handle)
                 if (++handshake_attempts >= 3)
                 {
                     handshake_attempts = 0;
-                    handle->comm_state--;
+                    handle->comm_state = WAITING_SYNCING;
                 }
+            }
+        }
+        else
+        {
+            if (++handshake_timeout >= 200)
+            {
+                handshake_timeout = 0;
+                handle->comm_state = WAITING_SYNCING;
             }
         }
     }
     else if (handle->comm_state == WAITING_DEV_DESCRIPTOR)
     {
+        static int dev_desc_timeout;
+
         if (msg_rx->command == CC_CMD_DEV_DESCRIPTOR)
         {
-            // build and send device descriptor message
-            cc_msg_builder(CC_CMD_DEV_DESCRIPTOR, device, handle->msg_tx);
-            send(handle, handle->msg_tx);
-
-            // device assumes message was successfully delivered
-            handle->comm_state++;
+            if (msg_rx->data[0] == CC_DEVICE_DESC_REQ)
+            {
+                // build and send device descriptor message
+                cc_msg_builder(CC_CMD_DEV_DESCRIPTOR, device, handle->msg_tx);
+                send(handle, handle->msg_tx);
+            }
+            else if (msg_rx->data[0] == CC_DEVICE_DESC_ACK)
+            {
+                // device descriptor was successfully delivered
+                handle->comm_state++;
+                dev_desc_timeout = 0;
+            }
+        }
+        else
+        {
+            if (++dev_desc_timeout >= 200)
+            {
+                dev_desc_timeout = 0;
+                handle->comm_state = WAITING_SYNCING;
+            }
         }
     }
     else if (handle->comm_state == LISTENING_REQUESTS)
