@@ -24,7 +24,7 @@ extern "C"
 
 // protocol version
 #define CC_PROTOCOL_MAJOR       0
-#define CC_PROTOCOL_MINOR       3
+#define CC_PROTOCOL_MINOR       4
 
 // define serial communication baud rate
 #define CC_BAUD_RATE       500000
