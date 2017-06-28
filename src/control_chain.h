@@ -26,8 +26,9 @@ extern "C"
 #define CC_PROTOCOL_MAJOR       0
 #define CC_PROTOCOL_MINOR       4
 
-// define serial communication baud rate
-#define CC_BAUD_RATE       500000
+// define serial communication baud rate and frame period
+#define CC_BAUD_RATE        500000      // in bps
+#define CC_FRAME_PERIOD     1000        // in us
 
 // define versions as strings
 #define CC_PROTOCOL_VERSION VERSION2_STR(CC_PROTOCOL_MAJOR, CC_PROTOCOL_MINOR)

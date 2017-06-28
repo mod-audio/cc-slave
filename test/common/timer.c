@@ -29,9 +29,9 @@ void timer_init(void (*callback)(void))
     g_timer_cb = callback;
 }
 
-void timer_set(uint32_t time_ms)
+void timer_set(uint32_t time_us)
 {
-    printf("timer_set (time_ms = %i)\n", time_ms);
+    printf("timer_set (time_us = %i)\n", time_us);
 
     // zero interval means no reset of timer
     timerclear(&tval.it_interval);
@@ -39,7 +39,7 @@ void timer_set(uint32_t time_ms)
 
     // set timer
     tval.it_value.tv_sec = 0;
-    tval.it_value.tv_usec = 1000 * time_ms;
+    tval.it_value.tv_usec = time_us;
     setitimer(ITIMER_REAL, &tval, NULL);
 }
 

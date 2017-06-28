@@ -246,7 +246,7 @@ static void parser(cc_handle_t *handle)
         {
             // device id is used to define the communication frame
             // timer is reseted each regular sync message
-            timer_set(handle->device_id);
+            timer_set(handle->device_id * CC_FRAME_PERIOD);
         }
         else if (msg_rx->command == CC_CMD_DEV_CONTROL)
         {
