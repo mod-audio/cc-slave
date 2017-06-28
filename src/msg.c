@@ -19,6 +19,13 @@
 
 #define MSG_MAX_INSTANCES   2
 
+// calculate how many bytes fit inside the frame
+#define BYTES_PER_FRAME     ((CC_FRAME_PERIOD * CC_BAUD_RATE) / (1000000 / 10))
+
+// maximum number of updates which fit inside the frame
+// the update command has 6 bytes of overhead and each update data need 5 bytes
+#define MAX_UPDATES_PER_FRAME   ((BYTES_PER_FRAME - 6) / 5)
+
 
 /*
 ****************************************************************************************************
@@ -228,14 +235,19 @@ int cc_msg_builder(int command, const void *data_struct, cc_msg_t *msg)
     }
     else if (command == CC_CMD_DATA_UPDATE)
     {
-        *pdata++ = cc_updates_count();
+        int count = cc_updates_count();
+        if (count > MAX_UPDATES_PER_FRAME)
+            count = MAX_UPDATES_PER_FRAME;
+
+        *pdata++ = count;
 
         // serialize updates data
-        cc_update_t update;
-        while (cc_update_pop(&update))
+        while (count--)
         {
-            uint8_t *pvalue = (uint8_t *) &update.value;
+            cc_update_t update;
+            cc_update_pop(&update);
 
+            uint8_t *pvalue = (uint8_t *) &update.value;
             *pdata++ = update.assignment_id;
             *pdata++ = *pvalue++;
             *pdata++ = *pvalue++;
