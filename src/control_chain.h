@@ -87,6 +87,9 @@ extern "C"
 #define CC_OPTIONS_LIST_SUPPORTED
 #endif
 
+// fallback option for serial baud rate
+#define CC_BAUD_RATE_FALLBACK   115200
+
 // these includes have to be added after the configuration
 #include "device.h"
 #include "handshake.h"
@@ -124,7 +127,7 @@ enum {CC_EV_HANDSHAKE_FAILED, CC_EV_ASSIGNMENT, CC_EV_UNASSIGNMENT, CC_EV_UPDATE
 
 void cc_init(void (*response_cb)(void *arg), void (*events_cb)(void *arg));
 void cc_process(void);
-void cc_parse(const cc_data_t *received);
+int cc_parse(const cc_data_t *received);
 
 
 /*

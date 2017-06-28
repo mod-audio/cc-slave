@@ -16,6 +16,7 @@
 */
 
 // step between generated random numbers in bytes
+// this number is the size of the handshake message
 #define RANDOM_STEP_BYTES   (CC_MSG_HEADER_SIZE + 2 + 7)
 
 // random generation boundaries
@@ -23,7 +24,8 @@
 #define RANDOM_MIN      100
 
 // convert step value from bytes to microseconds
-#define RANDOM_STEP     ((10 * 1000000 * RANDOM_STEP_BYTES)  / CC_BAUD_RATE)
+// FIXME: in the future change CC_BAUD_RATE_FALLBACK to CC_BAUD_RATE
+#define RANDOM_STEP     ((10 * 1000000 * RANDOM_STEP_BYTES)  / CC_BAUD_RATE_FALLBACK)
 
 // macro to generate random number within a range
 #define RANDOM_RANGE(min, max)              ((rand() % max) + min)

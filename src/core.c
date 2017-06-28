@@ -350,13 +350,15 @@ void cc_process(void)
     cc_actuators_process(g_cc_handle.events_cb);
 }
 
-void cc_parse(const cc_data_t *received)
+int cc_parse(const cc_data_t *received)
 {
-    uint16_t count = 0;
+    static uint32_t total_bytes;
+    static int msg_ok;
 
     cc_handle_t *handle = &g_cc_handle;
     cc_msg_t *msg = handle->msg_rx;
 
+    uint16_t count = 0;
     uint32_t size = received->size;
     while (size--)
     {
@@ -431,10 +433,23 @@ void cc_parse(const cc_data_t *received)
             // crc
             case 6:
                 if (crc8(msg->header, CC_MSG_HEADER_SIZE + msg->data_size) == byte)
+                {
                     parser(handle);
+                    msg_ok = 1;
+                }
 
                 handle->msg_state = 0;
                 break;
         }
+
+        // return error if no valid message was received after 3k bytes
+        if (++total_bytes >= 3000 && !msg_ok)
+        {
+            handle->msg_state = 0;
+            total_bytes = 0;
+            return -1;
+        }
     }
+
+    return 0;
 }
