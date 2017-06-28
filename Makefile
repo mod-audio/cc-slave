@@ -13,7 +13,7 @@ endif
 
 # flags
 CFLAGS += -Wall -fPIC
-LDFLAGS += -shared
+LDFLAGS += -shared -lm
 
 # libraries
 LIBS =
