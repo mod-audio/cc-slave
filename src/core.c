@@ -154,15 +154,16 @@ static void parser(cc_handle_t *handle)
             if (sync_cycle == CC_SYNC_HANDSHAKE_CYCLE)
             {
                 // generate handshake
-                device->handshake = cc_handshake_generate();
+                uint16_t wait_us;
+                device->handshake = cc_handshake_generate(&wait_us);
 
                 // build handshake message
                 cc_msg_builder(CC_CMD_HANDSHAKE, device->handshake, handle->msg_tx);
 
-                // use the random id value to delay the message before send it
+                // delay the message before send it (the delay value is based on the random id)
                 // this delay should minimize the chance of handshake conflicting
                 // since multiple devices can be connected at the same time
-                delay_us(device->handshake->random_id);
+                delay_us(wait_us);
 
                 // send message
                 handle->device_id = BROADCAST_ADDRESS;

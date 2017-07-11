@@ -55,7 +55,7 @@ typedef struct cc_handshake_mod_t {
 ****************************************************************************************************
 */
 
-cc_handshake_t *cc_handshake_generate(void);
+cc_handshake_t *cc_handshake_generate(uint16_t *delay_us);
 
 
 /*

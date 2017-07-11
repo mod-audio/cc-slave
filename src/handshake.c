@@ -15,23 +15,18 @@
 ****************************************************************************************************
 */
 
-// step between generated random numbers in bytes
-// this number is the size of the handshake message
-#define RANDOM_STEP_BYTES   (CC_MSG_HEADER_SIZE + 2 + 7)
+// size of the handshake message in bytes
+#define HANDSHAKE_SIZE_BYTES    (CC_MSG_HEADER_SIZE + 2 + 7)
 
-// random generation boundaries
-#define RANDOM_MAX      5000
-#define RANDOM_MIN      100
-
-// convert step value from bytes to microseconds
+// size of the handshake message in microseconds
 // FIXME: in the future change CC_BAUD_RATE_FALLBACK to CC_BAUD_RATE
-#define RANDOM_STEP     ((10 * 1000000 * RANDOM_STEP_BYTES)  / CC_BAUD_RATE_FALLBACK)
+#define HANDSHAKE_SIZE      ((10 * 1000000 * HANDSHAKE_SIZE_BYTES) / CC_BAUD_RATE_FALLBACK)
+
+// master will wait a period of 8 devices frames to receive handshakes
+#define HANDSHAKES_PERIOD   (((8 * CC_FRAME_PERIOD) / HANDSHAKE_SIZE) * HANDSHAKE_SIZE)
 
 // macro to generate random number within a range
-#define RANDOM_RANGE(min, max)              ((rand() % max) + min)
-
-// macro to generate random number within a range and using a defined step
-#define RANDOM_RANGE_STEP(min, max, step)   (RANDOM_RANGE(min/step, max/step) * step)
+#define RANDOM_RANGE(min, max)  ((min) + rand() / (RAND_MAX / ((max) - (min) + 1) + 1))
 
 
 /*
@@ -70,12 +65,13 @@ static cc_handshake_t g_handshake;
 ****************************************************************************************************
 */
 
-cc_handshake_t *cc_handshake_generate(void)
+cc_handshake_t *cc_handshake_generate(uint16_t *delay_us)
 {
     cc_handshake_t *handshake = &g_handshake;
 
     // generate random number
-    handshake->random_id = RANDOM_RANGE_STEP(RANDOM_MIN, RANDOM_MAX, RANDOM_STEP);
+    uint16_t random_id = RANDOM_RANGE(0, 0xFFFF);
+    handshake->random_id = random_id;
 
     // protocol version
     handshake->protocol.major = CC_PROTOCOL_MAJOR;
@@ -86,6 +82,9 @@ cc_handshake_t *cc_handshake_generate(void)
     handshake->firmware.major = CC_FIRMWARE_MAJOR;
     handshake->firmware.minor = CC_FIRMWARE_MINOR;
     handshake->firmware.micro = CC_FIRMWARE_MICRO;
+
+    // calculate the delay based on the random id
+    *delay_us = ((random_id % HANDSHAKES_PERIOD) / HANDSHAKE_SIZE) * HANDSHAKE_SIZE;
 
     return handshake;
 }
