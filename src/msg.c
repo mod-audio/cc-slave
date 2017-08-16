@@ -21,7 +21,7 @@
 
 // calculate how many bytes fit inside the frame
 // FIXME: in the future change CC_BAUD_RATE_FALLBACK to CC_BAUD_RATE
-#define BYTES_PER_FRAME     ((CC_FRAME_PERIOD * CC_BAUD_RATE_FALLBACK) / (1000000 / 10))
+#define BYTES_PER_FRAME     ((CC_FRAME_PERIOD * CC_BAUD_RATE_FALLBACK) / (1000000 * 10))
 
 // maximum number of updates which fit inside the frame
 // the update command has 6 bytes of overhead and each update data need 5 bytes
