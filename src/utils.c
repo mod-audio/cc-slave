@@ -150,21 +150,21 @@ int str16_serialize(const str16_t *str, uint8_t *buffer)
 
 int str16_deserialize(const uint8_t *data, str16_t *str)
 {
-    uint8_t written = 0;
+    uint8_t to_consume = 0;
 
     if (str)
     {
         str->size = *data++;
-
+        to_consume = str->size + 1;
+        
         if (str->size > 16)
             str->size = 16;
 
         memcpy(str->text, (char *) data, str->size);
         str->text[str->size] = 0;
-        written = str->size + 1;
     }
 
-    return written;
+    return to_consume;
 }
 
 int bytes_to_float(const uint8_t *array, float *pvar)
