@@ -59,6 +59,8 @@ typedef struct cc_device_t {
 cc_device_t *cc_device_new(const char *name, const char *uri);
 // add actuator to device actuators list
 void cc_device_actuator_add(cc_device_t *device, cc_actuator_t *actuator);
+// get actuator from device actuators lsit
+cc_actuator_t *cc_device_actuator_get(cc_device_t *device, uint8_t actuator_id);
 // return a device object (only one device is supported)
 cc_device_t *cc_device_get(void);
 
