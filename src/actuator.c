@@ -101,7 +101,7 @@ static int continuos_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
 
     // check if actuator value has changed the minimum required value
     float delta = (actuator->max + actuator->min) * 0.01;
-    if (fabs(actuator->last_value - actuator_value) < delta)
+    if (fabsf(actuator->last_value - actuator_value) < delta)
         return 0;
 
     // update value
