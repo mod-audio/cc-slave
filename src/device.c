@@ -81,7 +81,7 @@ void cc_device_actuator_add(cc_device_t *device, cc_actuator_t *actuator)
 
 cc_actuator_t *cc_device_actuator_get(cc_device_t *device, uint8_t actuator_id)
 {
-    if (0 <= actuator_id && actuator_id < device->actuators_count) {
+    if (actuator_id < device->actuators_count) {
         return device->actuators[actuator_id];
     }
     return 0;

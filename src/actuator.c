@@ -214,7 +214,7 @@ cc_actuator_t *cc_actuator_new(cc_actuator_config_t *config)
 void cc_actuator_map(cc_assignment_t *assignment)
 {
     // link assignment to actuator
-    for (int i = 0; i < g_actuators_count; i++)
+    for (uint8_t i = 0; i < g_actuators_count; i++)
     {
         cc_actuator_t *actuator = &g_actuators[i];
         if (actuator->id == assignment->actuator_id)
@@ -242,7 +242,7 @@ void cc_actuator_map(cc_assignment_t *assignment)
 
 void cc_actuator_unmap(cc_assignment_t *assignment)
 {
-    for (int i = 0; i < g_actuators_count; i++)
+    for (uint8_t i = 0; i < g_actuators_count; i++)
     {
         cc_actuator_t *actuator = &g_actuators[i];
         if (actuator->id == assignment->actuator_id)
@@ -255,7 +255,7 @@ void cc_actuator_unmap(cc_assignment_t *assignment)
 
 void cc_actuators_process(void (*events_cb)(void *arg))
 {
-    for (int i = 0; i < g_actuators_count; i++)
+    for (uint8_t i = 0; i < g_actuators_count; i++)
     {
         cc_actuator_t *actuator = &g_actuators[i];
         cc_assignment_t *assignment = actuator->assignment;
