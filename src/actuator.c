@@ -52,6 +52,22 @@ static unsigned int g_actuators_count;
 static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignment)
 {
     float actuator_value = *(actuator->value);
+
+    //tap tempo
+    if (assignment->mode & CC_MODE_TAP_TEMPO)
+    {
+        // check if actuator value has changed the minimum required value
+        float delta = (actuator->max + actuator->min) * 0.01;
+        if (fabsf(actuator->last_value - actuator_value) < delta)
+            return 0;
+
+        // update value
+        actuator->last_value = actuator_value;
+        assignment->value = actuator_value;
+
+        return 1;
+    }
+    else 
     if (actuator_value > 0.0)
     {
         if (actuator->lock == 0)
@@ -170,6 +186,7 @@ static int continuos_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
 
 static int update_assignment_value(cc_actuator_t *actuator, cc_assignment_t *assignment)
 {
+    //check if thisis the change from set
     switch (actuator->type)
     {
         case CC_ACTUATOR_MOMENTARY:
@@ -178,7 +195,6 @@ static int update_assignment_value(cc_actuator_t *actuator, cc_assignment_t *ass
         case CC_ACTUATOR_CONTINUOUS:
             return continuos_process(actuator, assignment);
     }
-
     return 0;
 }
 

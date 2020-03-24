@@ -171,6 +171,16 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
 
         *assignment_id = *pdata++;
     }
+    else if (msg->command == CC_CMD_SET_VALUE)
+    {
+        cc_ui_update_t *update = data_struct;
+
+        // assignment id, actuator id
+        update->assignment_id = *pdata++;
+        update->actuator_id = *pdata++; 
+
+        pdata += bytes_to_float(pdata, &update->value);
+    }
 
     return 0;
 }
@@ -230,7 +240,7 @@ int cc_msg_builder(int command, const void *data_struct, cc_msg_t *msg)
             *pdata++ = actuator->max_assignments;
         }
     }
-    else if (command == CC_CMD_ASSIGNMENT || command == CC_CMD_UNASSIGNMENT)
+    else if (command == CC_CMD_ASSIGNMENT || command == CC_CMD_UNASSIGNMENT || command == CC_CMD_SET_VALUE)
     {
         // no data
     }

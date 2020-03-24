@@ -103,6 +103,13 @@ int cc_assignment_delete(int assignment_id)
     return -1;
 }
 
+cc_assignment_t *cc_assignment_get(int assignment_id)
+{
+    cc_assignment_t *assignment = &g_assignments[assignment_id];
+    return assignment;
+}
+
+
 inline void cc_assignments_clear(void)
 {
     cc_assignment_delete(-1);

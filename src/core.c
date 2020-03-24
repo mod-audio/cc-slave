@@ -286,6 +286,16 @@ static void parser(cc_handle_t *handle)
             cc_msg_builder(CC_CMD_UNASSIGNMENT, 0, handle->msg_tx);
             send(handle, handle->msg_tx);
         }
+        else if (msg_rx->command == CC_CMD_SET_VALUE)
+        {
+            cc_ui_update_t update;
+            cc_msg_parser(msg_rx, &update);
+
+            raise_event(handle, CC_CMD_SET_VALUE, &update);
+
+            cc_msg_builder(CC_CMD_SET_VALUE, 0, handle->msg_tx);
+            send(handle, handle->msg_tx);
+        }
     }
 }
 
