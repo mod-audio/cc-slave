@@ -168,7 +168,7 @@ static int continuos_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
     float value = a*actuator_value + b;
 
     // real mode
-    if ((assignment->mode & CC_MODE_REAL) || (assignment->mode & CC_MODE_TAP_TEMPO)
+    if ((assignment->mode & CC_MODE_REAL) || (assignment->mode & CC_MODE_TAP_TEMPO))
     {
         assignment->value = value;
         return 1;
@@ -186,7 +186,6 @@ static int continuos_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
 
 static int update_assignment_value(cc_actuator_t *actuator, cc_assignment_t *assignment)
 {
-    //check if thisis the change from set
     switch (actuator->type)
     {
         case CC_ACTUATOR_MOMENTARY:

@@ -173,7 +173,7 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
     }
     else if (msg->command == CC_CMD_SET_VALUE)
     {
-        cc_ui_update_t *update = data_struct;
+        cc_set_value_t *update = data_struct;
 
         // assignment id, actuator id
         update->assignment_id = *pdata++;

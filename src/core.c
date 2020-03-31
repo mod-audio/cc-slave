@@ -288,7 +288,7 @@ static void parser(cc_handle_t *handle)
         }
         else if (msg_rx->command == CC_CMD_SET_VALUE)
         {
-            cc_ui_update_t update;
+            cc_set_value_t update;
             cc_msg_parser(msg_rx, &update);
 
             raise_event(handle, CC_CMD_SET_VALUE, &update);
