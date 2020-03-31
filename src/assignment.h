@@ -27,7 +27,7 @@ extern "C"
 #define CC_MODE_OPTIONS  	0x04
 #define CC_MODE_REAL     	0x10
 #define CC_MODE_INTEGER  	0x20
-#define CC_MODE_TAP_TEMPO 	0x50
+#define CC_MODE_TAP_TEMPO 	0x40
 /*
 ****************************************************************************************************
 *       CONFIGURATION

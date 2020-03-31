@@ -168,7 +168,7 @@ static int continuos_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
     float value = a*actuator_value + b;
 
     // real mode
-    if (assignment->mode & CC_MODE_REAL)
+    if ((assignment->mode & CC_MODE_REAL) || (assignment->mode & CC_MODE_TAP_TEMPO)
     {
         assignment->value = value;
         return 1;
