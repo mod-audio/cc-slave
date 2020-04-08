@@ -24,7 +24,19 @@
 #define I_AM_ALIVE_PERIOD   50      // in sync cycles
 
 #define RX_BUFFER_SIZE      64 + (CC_MAX_OPTIONS_ITEMS * 20)
-#define TX_BUFFER_SIZE      128
+
+/* NOTE TX buffer needs to be able to contain the entire device descriptor
+ * The entire buffer consists of:
+ *  - header (4 bytes)
+ *  - uri (arbitrary length + 1, max 256 bytes)
+ *  - label (arbitrary length + 1, max 256 bytes)
+ *  - actuator count (1 byte)
+ *  - now per each actuator:
+ *    - name (max 17 bytes)
+ *    - supported modes bitmask (4 bytes)
+ *    - number of max assignments (1 byte)
+ */
+#define TX_BUFFER_SIZE      64 + (24 * CC_MAX_DEVICES * CC_MAX_ACTUATORS)
 
 
 /*

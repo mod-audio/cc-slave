@@ -75,6 +75,9 @@ cc_device_t *cc_device_new(const char *name, const char *uri)
 
 void cc_device_actuator_add(cc_device_t *device, cc_actuator_t *actuator)
 {
+    if (device->actuators_count >= CC_MAX_ACTUATORS)
+        return;
+
     device->actuators[device->actuators_count] = actuator;
     device->actuators_count++;
 }
