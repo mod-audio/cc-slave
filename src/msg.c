@@ -177,6 +177,9 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
 
 int cc_msg_builder(int command, const void *data_struct, cc_msg_t *msg)
 {
+#ifdef XC16
+    unsigned int i;
+#endif
     uint8_t *pdata = msg->data;
     msg->command = command;
 
@@ -212,7 +215,11 @@ int cc_msg_builder(int command, const void *data_struct, cc_msg_t *msg)
         *pdata++ = device->actuators_count;
 
         // serialize actuators data
+#ifdef XC16
+        for (i = 0; i < device->actuators_count; i++)
+#else
         for (unsigned int i = 0; i < device->actuators_count; i++)
+#endif
         {
             cc_actuator_t *actuator = device->actuators[i];
 
