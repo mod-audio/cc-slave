@@ -7,8 +7,12 @@
 #include "control_chain.h"
 #include "actuator.h"
 #include "update.h"
+#ifdef XC16
+extern float roundf(float);
+extern float fabsf(float);
+#else
 #include <math.h>
-
+#endif
 
 /*
 ****************************************************************************************************
