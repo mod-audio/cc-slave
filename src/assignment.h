@@ -30,6 +30,11 @@ extern "C"
 #define CC_MODE_TAP_TEMPO 	0x40
 #define CC_MODE_MOMENTARY   0x80
 
+//list defines
+#define LIST_MODE_LED_CYCLING 	0x01
+#define LIST_MODE_SCROLL_DIR	0x02
+#define LIST_MODE_GROUPED		0x04
+
 /*
 ****************************************************************************************************
 *       CONFIGURATION
@@ -51,6 +56,7 @@ typedef struct cc_assignment_t {
     uint8_t list_count;
 #ifndef CC_STRING_NOT_SUPPORTED
     uint8_t list_index;
+    uint8_t list_bitmask;
     option_t **list_items;
     str16_t label, unit;
 #endif

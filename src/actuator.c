@@ -67,7 +67,23 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
 
         return 1;
     }
-    else 
+
+    // Momentary
+    if (assignment->mode & CC_MODE_MOMENTARY)
+    {    
+         
+        if(actuator_value != assignment->value)
+        {
+            assignment->value = 1.0 - assignment->value;
+
+            return 1;     
+        }
+        else
+        {
+            return 0;
+        }      
+    }
+
     if (actuator_value > 0.0)
     {
         if (actuator->lock == 0)
@@ -84,8 +100,9 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
                     assignment->list_index = 0;
 
                 assignment->value = assignment->list_items[assignment->list_index]->value;
+
+                return 1;
             }
-            else
 #endif
 
             // trigger mode
@@ -95,7 +112,7 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
             }
 
             // toggle mode
-            else if (assignment->mode & CC_MODE_TOGGLE)
+            if (assignment->mode & CC_MODE_TOGGLE)
             {
                 assignment->value = 1.0 - assignment->value;
             }

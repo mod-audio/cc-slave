@@ -149,9 +149,16 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
         // default value of list count
         assignment->list_count = 0;
 
+        // default value of list_bitmask
+        assignment->list_bitmask = 0;
+
 #ifdef CC_OPTIONS_LIST_SUPPORTED
+        
         // list count
         assignment->list_count = *pdata++;
+
+        // list_bitmsk 
+        assignment->list_bitmask = *pdata++;
 
         // list items
         assignment->list_items = options_list_create(assignment->list_count);
