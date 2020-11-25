@@ -71,8 +71,7 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
     // Momentary
     if (assignment->mode & CC_MODE_MOMENTARY)
     {    
-         
-        if(actuator_value != assignment->value)
+        if (actuator_value != assignment->value)
         {
             assignment->value = 1.0 - assignment->value;
 
