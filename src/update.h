@@ -40,6 +40,11 @@ typedef struct cc_update_t {
     float value;
 } cc_update_t;
 
+typedef struct cc_set_value_t {
+    int assignment_id;
+    int actuator_id;
+    float value;
+} cc_set_value_t;
 
 /*
 ****************************************************************************************************

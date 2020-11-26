@@ -52,6 +52,37 @@ static unsigned int g_actuators_count;
 static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignment)
 {
     float actuator_value = *(actuator->value);
+
+    //tap tempo
+    if (assignment->mode & CC_MODE_TAP_TEMPO)
+    {
+        // check if actuator value has changed the minimum required value
+        float delta = (actuator->max + actuator->min) * 0.01;
+        if (fabsf(actuator->last_value - actuator_value) < delta)
+            return 0;
+
+        // update value
+        actuator->last_value = actuator_value;
+        assignment->value = actuator_value;
+
+        return 1;
+    }
+
+    // Momentary
+    if (assignment->mode & CC_MODE_MOMENTARY)
+    {    
+        if (actuator_value != assignment->value)
+        {
+            assignment->value = 1.0 - assignment->value;
+
+            return 1;     
+        }
+        else
+        {
+            return 0;
+        }      
+    }
+
     if (actuator_value > 0.0)
     {
         if (actuator->lock == 0)
@@ -68,8 +99,9 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
                     assignment->list_index = 0;
 
                 assignment->value = assignment->list_items[assignment->list_index]->value;
+
+                return 1;
             }
-            else
 #endif
 
             // trigger mode
@@ -152,7 +184,7 @@ static int continuos_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
     float value = a*actuator_value + b;
 
     // real mode
-    if (assignment->mode & CC_MODE_REAL)
+    if ((assignment->mode & CC_MODE_REAL) || (assignment->mode & CC_MODE_TAP_TEMPO))
     {
         assignment->value = value;
         return 1;
@@ -178,7 +210,6 @@ static int update_assignment_value(cc_actuator_t *actuator, cc_assignment_t *ass
         case CC_ACTUATOR_CONTINUOUS:
             return continuos_process(actuator, assignment);
     }
-
     return 0;
 }
 

@@ -136,35 +136,40 @@ int str16_create(const char *str, str16_t *dest)
     for (i = 0; i < 16 && str[i]; i++)
         dest->text[i] = str[i];
 
+    dest->text[i] = 0;
     dest->size = i;
     return i;
 }
 
 int str16_serialize(const str16_t *str, uint8_t *buffer)
 {
-    buffer[0] = str->size;
-    memcpy(&buffer[1], str->text, str->size);
+    // data corruption can cause wrong size, let's avoid blowing up just in case
+    const uint8_t realsize = str->size > 16 ? 16 : str->size;
 
-    return (str->size + 1);
+    buffer[0] = realsize;
+    memcpy(&buffer[1], str->text, realsize);
+    buffer[realsize + 1] = 0;
+
+    return (realsize + 1);
 }
 
 int str16_deserialize(const uint8_t *data, str16_t *str)
 {
-    uint8_t to_consume = 0;
+    uint8_t written = 0;
 
     if (str)
     {
         str->size = *data++;
-        to_consume = str->size + 1;
-        
+
         if (str->size > 16)
             str->size = 16;
 
         memcpy(str->text, (char *) data, str->size);
         str->text[str->size] = 0;
+        written = str->size + 1;
     }
 
-    return to_consume;
+    return written;
 }
 
 int bytes_to_float(const uint8_t *array, float *pvar)
