@@ -150,7 +150,6 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
         assignment->list_count = 0;
 
 #ifdef CC_OPTIONS_LIST_SUPPORTED
-        
         // list count
         assignment->list_count = *pdata++;
 
@@ -178,9 +177,10 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
 
         // assignment id, actuator id
         update->assignment_id = *pdata++;
-        update->actuator_id = *pdata++; 
+        update->actuator_id = *pdata++;
 
-        pdata += bytes_to_float(pdata, &update->value);
+        // value to set
+        bytes_to_float(pdata, &update->value);
     }
 
     return 0;
