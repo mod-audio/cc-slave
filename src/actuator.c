@@ -70,12 +70,13 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
 
     // Momentary
     if (assignment->mode & CC_MODE_MOMENTARY)
-    {    
-        if (actuator_value != assignment->value)
+    {   
+        if (actuator->last_value != actuator_value)
         {
-            assignment->value = 1.0 - assignment->value;
+                assignment->value = 1.0 - assignment->value;
+                actuator->last_value = actuator_value;
 
-            return 1;     
+                return 1;
         }
         else
         {
@@ -279,6 +280,7 @@ void cc_actuator_unmap(cc_assignment_t *assignment)
         if (actuator->id == assignment->actuator_id)
         {
             actuator->assignment = 0;
+            actuator->last_value = 0;
             break;
         }
     }
