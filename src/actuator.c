@@ -73,8 +73,8 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
     {   
         if (fabs(actuator->last_value - actuator_value) > delta)
         {
-            assignment->value = 1.0 - assignment->value;
-            actuator->last_value = actuator_value;
+                assignment->value = 1.0 - assignment->value;
+                actuator->last_value = actuator_value;
 
                 return 1;
         }
