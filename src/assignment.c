@@ -75,7 +75,7 @@ cc_assignment_t *cc_assignment_new(void)
         }
     }
 
-    return 0;
+    return NULL;
 }
 
 int cc_assignment_delete(int assignment_id)
@@ -105,10 +105,16 @@ int cc_assignment_delete(int assignment_id)
 
 cc_assignment_t *cc_assignment_get(int assignment_id)
 {
-    cc_assignment_t *assignment = &g_assignments[assignment_id];
-    return assignment;
-}
+    for (int i = 0; i < MAX_ASSIGNMENTS; i++)
+    {
+        cc_assignment_t *assignment = &g_assignments[i];
 
+        if (assignment_id == assignment->id)
+            return assignment;
+    }
+
+    return NULL;
+}
 
 inline void cc_assignments_clear(void)
 {

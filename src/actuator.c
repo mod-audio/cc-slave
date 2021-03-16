@@ -52,12 +52,12 @@ static unsigned int g_actuators_count;
 static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignment)
 {
     float actuator_value = *(actuator->value);
+    float delta = (actuator->max - actuator->min) * 0.01;
 
     //tap tempo
     if (assignment->mode & CC_MODE_TAP_TEMPO)
     {
         // check if actuator value has changed the minimum required value
-        float delta = (actuator->max + actuator->min) * 0.01;
         if (fabsf(actuator->last_value - actuator_value) < delta)
             return 0;
 
@@ -70,12 +70,13 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
 
     // Momentary
     if (assignment->mode & CC_MODE_MOMENTARY)
-    {    
-        if (actuator_value != assignment->value)
+    {   
+        if (fabs(actuator->last_value - actuator_value) > delta)
         {
-            assignment->value = 1.0 - assignment->value;
+                assignment->value = 1.0 - assignment->value;
+                actuator->last_value = actuator_value;
 
-            return 1;     
+                return 1;
         }
         else
         {
@@ -132,7 +133,7 @@ static int continuos_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
     float actuator_value = *(actuator->value);
 
     // check if actuator value has changed the minimum required value
-    float delta = (actuator->max + actuator->min) * 0.01;
+    float delta = (actuator->max - actuator->min) * 0.01;
     if (fabsf(actuator->last_value - actuator_value) < delta)
         return 0;
 
@@ -140,7 +141,7 @@ static int continuos_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
     actuator->last_value = actuator_value;
 
     // toggle and trigger modes
-    if (assignment->mode & CC_MODE_TOGGLE || assignment->mode & CC_MODE_TRIGGER)
+    if ((assignment->mode & CC_MODE_TOGGLE) || (assignment->mode & CC_MODE_TRIGGER))
     {
         float middle = (actuator->max + actuator->min) / 2.0;
 
@@ -279,6 +280,7 @@ void cc_actuator_unmap(cc_assignment_t *assignment)
         if (actuator->id == assignment->actuator_id)
         {
             actuator->assignment = 0;
+            actuator->last_value = 0;
             break;
         }
     }
