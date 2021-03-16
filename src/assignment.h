@@ -70,6 +70,7 @@ typedef struct cc_assignment_t {
 cc_assignment_t *cc_assignment_new(void);
 // delete an assignment
 int cc_assignment_delete(int assignment_id);
+// get the assignment with a specific id (can return null)
 cc_assignment_t *cc_assignment_get(int assignment_id);
 // remove all assignments
 void cc_assignments_clear(void);
