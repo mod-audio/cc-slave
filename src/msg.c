@@ -240,6 +240,23 @@ int cc_msg_builder(int command, const void *data_struct, cc_msg_t *msg)
             // max assignments
             *pdata++ = actuator->max_assignments;
         }
+
+        //number of actuatorgroups
+        *pdata++ = device->actuatorgroups_count;
+
+        //serialize actuatorgroups data
+        for (unsigned int i = 0; i < device->actuatorgroups_count; i++)
+        {
+            cc_actuatorgroup_t *actuatorgroup = device->actuatorgroups[i];
+
+            // actuatorgroup name
+            pdata += str16_serialize(&actuatorgroup->name, pdata);
+
+            // actuators in actuatorgroup
+            *pdata++ = actuatorgroup->actuators_in_group[0];
+            *pdata++ = actuatorgroup->actuators_in_group[1];
+
+        }
     }
     else if (command == CC_CMD_ASSIGNMENT || command == CC_CMD_UNASSIGNMENT || command == CC_CMD_SET_VALUE)
     {

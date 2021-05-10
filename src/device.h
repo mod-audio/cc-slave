@@ -46,6 +46,8 @@ typedef struct cc_device_t {
     cc_handshake_t *handshake;
     cc_actuator_t **actuators;
     unsigned int actuators_count;
+    cc_actuatorgroup_t **actuatorgroups;
+    unsigned int actuatorgroups_count;
 } cc_device_t;
 
 
@@ -59,6 +61,8 @@ typedef struct cc_device_t {
 cc_device_t *cc_device_new(const char *name, const char *uri);
 // add actuator to device actuators list
 void cc_device_actuator_add(cc_device_t *device, cc_actuator_t *actuator);
+// add actuatorgroup to device actuatorgroup list
+void cc_device_actuatorgroup_add(cc_device_t *device, cc_actuatorgroup_t *actuatorgroup);
 // get actuator from device actuators lsit
 cc_actuator_t *cc_device_actuator_get(cc_device_t *device, uint8_t actuator_id);
 // return a device object (only one device is supported)

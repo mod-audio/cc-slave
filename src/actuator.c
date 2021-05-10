@@ -17,7 +17,7 @@
 */
 
 #define MAX_ACTUATORS   (CC_MAX_DEVICES * CC_MAX_ACTUATORS)
-
+#define MAX_ACTUATORGROUPS (CC_MAX_DEVICES * CC_MAX_ACTUATORGROUPS)
 
 /*
 ****************************************************************************************************
@@ -41,6 +41,8 @@
 
 static cc_actuator_t g_actuators[MAX_ACTUATORS];
 static unsigned int g_actuators_count;
+static cc_actuatorgroup_t g_actuatorgroups[MAX_ACTUATORGROUPS];
+static unsigned int g_actuatorgroups_count;
 
 
 /*
@@ -241,6 +243,23 @@ cc_actuator_t *cc_actuator_new(cc_actuator_config_t *config)
     g_actuators_count++;
 
     return actuator;
+}
+
+cc_actuatorgroup_t *cc_actuatorgroup_new(cc_actuatorgroup_config_t *config)
+{
+    if (g_actuatorgroups_count >= MAX_ACTUATORGROUPS)
+        return 0;
+
+    cc_actuatorgroup_t *actuatorgroup = &g_actuatorgroups[g_actuatorgroups_count];
+
+    //initialize actuatorgroup data struct
+    actuatorgroup->actuators_in_group[0] = config->actuator_1;
+    actuatorgroup->actuators_in_group[1] = config->actuator_2;
+    str16_create(config->name, &actuatorgroup->name);
+
+    g_actuatorgroups_count++;
+
+    return actuatorgroup;
 }
 
 void cc_actuator_map(cc_assignment_t *assignment)
