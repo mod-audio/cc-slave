@@ -35,11 +35,12 @@
  *    - name (max 17 bytes)
  *    - supported modes bitmask (4 bytes)
  *    - number of max assignments (1 byte)
- *    - now per each actuatorgroup
- *    - name (max 17 bytes)
- *    - actuators in actuatorgroup (2 bytes)
+ *  - actuator group count (1 byte)
+ *  - now per each actuator group:
+ *      - name (max 17 bytes)
+ *      - actuators in actuatorgroup (2 bytes)
  */
-#define TX_BUFFER_SIZE      64 + (24 * CC_MAX_DEVICES * CC_MAX_ACTUATORS) + (CC_MAX_DEVICES * CC_MAX_ACTUATORGROUPS * 19)
+#define TX_BUFFER_SIZE      64 + (24 * CC_MAX_DEVICES * CC_MAX_ACTUATORS) + (CC_MAX_DEVICES * CC_MAX_ACTUATORGROUPS * 22)
 
 /*
 ****************************************************************************************************

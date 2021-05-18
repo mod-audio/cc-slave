@@ -241,10 +241,10 @@ int cc_msg_builder(int command, const void *data_struct, cc_msg_t *msg)
             *pdata++ = actuator->max_assignments;
         }
 
-        //number of actuatorgroups
+        // number of actuatorgroups
         *pdata++ = device->actuatorgroups_count;
 
-        //serialize actuatorgroups data
+        // serialize actuatorgroups data
         for (unsigned int i = 0; i < device->actuatorgroups_count; i++)
         {
             cc_actuatorgroup_t *actuatorgroup = device->actuatorgroups[i];
