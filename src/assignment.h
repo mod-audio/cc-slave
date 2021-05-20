@@ -31,6 +31,8 @@ extern "C"
 #define CC_MODE_LOGARITHMIC 0x040
 #define CC_MODE_COLOURED    0x100
 #define CC_MODE_MOMENTARY   0x200
+#define CC_MODE_REVERSE     0x400
+#define CC_MODE_GROUP       0x800
 
 
 /*
@@ -57,6 +59,7 @@ typedef struct cc_assignment_t {
     option_t **list_items;
     str16_t label, unit;
 #endif
+    int actuator_pair_id;
 } cc_assignment_t;
 
 

@@ -332,6 +332,30 @@ void cc_actuators_process(void (*events_cb)(void *arg))
                 event.data = assignment;
                 events_cb(&event);
             }
+
+            // handle actuator groups
+            if (assignment->actuator_pair_id != -1)
+            {
+                for (uint8_t j = 0; j < g_actuators_count; j++)
+                {
+                    cc_actuator_t *actuator2 = &g_actuators[i];
+                    if (actuator2->id == assignment->actuator_pair_id)
+                    {
+                        *actuator2->value = *actuator->value;
+                        cc_assignment_t *assignment2 = actuator2->assignment;
+                        update_assignment_value(actuator2, assignment2);
+
+                        if (events_cb)
+                        {
+                            cc_event_t event;
+                            event.id = CC_EV_UPDATE;
+                            event.data = assignment2;
+                            events_cb(&event);
+                        }
+                        break;
+                    }
+                }
+            }
         }
     }
 }

@@ -71,6 +71,7 @@ cc_assignment_t *cc_assignment_new(void)
         if (assignment->id == -1)
         {
             assignment->id = 0;
+            assignment->actuator_pair_id = -1;
             return assignment;
         }
     }

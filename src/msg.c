@@ -164,6 +164,12 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
             pdata += bytes_to_float(pdata, &item->value);
         }
 #endif
+
+        // actuator pair id
+        if (assignment->mode & CC_MODE_GROUP)
+            assignment->actuator_pair_id = *pdata++;
+        else
+            assignment->actuator_pair_id = -1;
     }
     else if (msg->command == CC_CMD_UNASSIGNMENT)
     {
