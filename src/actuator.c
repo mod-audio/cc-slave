@@ -94,26 +94,25 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
 
             // option list mode
 #ifdef CC_OPTIONS_LIST_SUPPORTED
-            if (assignment->mode & CC_MODE_OPTIONS && !(assignment->mode & CC_MODE_REVERSE))
+            if (assignment->mode & CC_MODE_OPTIONS)
             {
-                assignment->list_index++;
-
-                if (assignment->list_index >= assignment->list_count)
-                    assignment->list_index = 0;
-
-                assignment->value = assignment->list_items[assignment->list_index]->value;
-
-                return 1;
-            }
-            if (assignment->mode & CC_MODE_REVERSE)
-            {
-                if (assignment->list_index == 0)
+                if (assignment->mode & CC_MODE_REVERSE)
                 {
-                    assignment->list_index = assignment->list_count - 1;
+                    if (assignment->list_index == 0)
+                    {
+                        assignment->list_index = assignment->list_count - 1;
+                    }
+                    else
+                    {
+                        assignment->list_index--;
+                    }
                 }
                 else
                 {
-                    assignment->list_index--;
+                    assignment->list_index++;
+
+                    if (assignment->list_index >= assignment->list_count)
+                        assignment->list_index = 0;
                 }
 
                 assignment->value = assignment->list_items[assignment->list_index]->value;
