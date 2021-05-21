@@ -384,8 +384,6 @@ void cc_actuators_process(void (*events_cb)(void *arg))
                     event.id = CC_EV_UPDATE;
                     event.data = assignment2;
                     events_cb(&event);
-
-                    break;
                 }
             }
         }
