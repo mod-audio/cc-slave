@@ -94,7 +94,7 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
 
             // option list mode
 #ifdef CC_OPTIONS_LIST_SUPPORTED
-            if (assignment->mode & CC_MODE_OPTIONS && assignment->mode & CC_MODE_GROUP)
+            if ((assignment->mode & CC_MODE_OPTIONS) && (assignment->mode & CC_MODE_GROUP))
             {
                 if (assignment->mode & CC_MODE_REVERSE)
                 {
@@ -125,6 +125,9 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
 
                 if (assignment->list_index >= assignment->list_count)
                     assignment->list_index = 0;
+
+                assignment->value = assignment->list_items[assignment->list_index]->value;
+                return 1;
             }
 #endif
 
@@ -237,20 +240,21 @@ static int update_assignment_value(cc_actuator_t *actuator, cc_assignment_t *ass
     return 0;
 }
 
-cc_assignment_t *update_group_assignment_value(cc_actuator_t *actuator, cc_assignment_t *assignment)
+cc_assignment_t *update_group_assignment_value(cc_assignment_t *assignment)
 {
-    for (uint8_t j = 0; j < g_actuators_count; j++)
+    for (uint8_t i = 0; i < g_actuators_count; i++)
     {
-        cc_actuator_t *actuator2 = &g_actuators[j];
+        cc_actuator_t *actuator2 = &g_actuators[i];
         if (actuator2->id == assignment->actuator_pair_id)
         {
             cc_assignment_t *assignment2 = actuator2->assignment;
             assignment2->list_index = assignment->list_index;
             assignment2->value = assignment->list_items[assignment->list_index]->value;
-            
+
             return assignment2;
         }
     }
+    return 0;
 }
 
 /*
@@ -372,16 +376,17 @@ void cc_actuators_process(void (*events_cb)(void *arg))
             // handle actuator groups
             if (assignment->actuator_pair_id != -1)
             {
-                cc_assignment_t *assignment2 = update_group_assignment_value(actuator, assignment);
+                cc_assignment_t *assignment2 = update_group_assignment_value(assignment);
 
-                if (events_cb)
+                if (assignment2 && events_cb)
                 {
                     cc_event_t event;
                     event.id = CC_EV_UPDATE;
                     event.data = assignment2;
                     events_cb(&event);
+
+                    break;
                 }
-                break;
             }
         }
     }
