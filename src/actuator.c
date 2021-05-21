@@ -94,7 +94,7 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
 
             // option list mode
 #ifdef CC_OPTIONS_LIST_SUPPORTED
-            if (assignment->mode & CC_MODE_OPTIONS)
+            if (assignment->mode & CC_MODE_OPTIONS && assignment->mode & CC_MODE_GROUP)
             {
                 if (assignment->mode & CC_MODE_REVERSE)
                 {
@@ -113,10 +113,18 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
 
                     if (assignment->list_index >= assignment->list_count)
                         assignment->list_index = 0;
+
                 }
 
                 assignment->value = assignment->list_items[assignment->list_index]->value;
                 return 1;
+            }
+            else if (assignment->mode & CC_MODE_OPTIONS)
+            {
+                assignment->list_index++;
+
+                if (assignment->list_index >= assignment->list_count)
+                    assignment->list_index = 0;
             }
 #endif
 
@@ -229,6 +237,21 @@ static int update_assignment_value(cc_actuator_t *actuator, cc_assignment_t *ass
     return 0;
 }
 
+cc_assignment_t *update_group_assignment_value(cc_actuator_t *actuator, cc_assignment_t *assignment)
+{
+    for (uint8_t j = 0; j < g_actuators_count; j++)
+    {
+        cc_actuator_t *actuator2 = &g_actuators[j];
+        if (actuator2->id == assignment->actuator_pair_id)
+        {
+            cc_assignment_t *assignment2 = actuator2->assignment;
+            assignment2->list_index = assignment->list_index;
+            assignment2->value = assignment->list_items[assignment->list_index]->value;
+            
+            return assignment2;
+        }
+    }
+}
 
 /*
 ****************************************************************************************************
@@ -349,25 +372,16 @@ void cc_actuators_process(void (*events_cb)(void *arg))
             // handle actuator groups
             if (assignment->actuator_pair_id != -1)
             {
-                for (uint8_t j = 0; j < g_actuators_count; j++)
-                {
-                    cc_actuator_t *actuator2 = &g_actuators[i];
-                    if (actuator2->id == assignment->actuator_pair_id)
-                    {
-                        *actuator2->value = *actuator->value;
-                        cc_assignment_t *assignment2 = actuator2->assignment;
-                        update_assignment_value(actuator2, assignment2);
+                cc_assignment_t *assignment2 = update_group_assignment_value(actuator, assignment);
 
-                        if (events_cb)
-                        {
-                            cc_event_t event;
-                            event.id = CC_EV_UPDATE;
-                            event.data = assignment2;
-                            events_cb(&event);
-                        }
-                        break;
-                    }
+                if (events_cb)
+                {
+                    cc_event_t event;
+                    event.id = CC_EV_UPDATE;
+                    event.data = assignment2;
+                    events_cb(&event);
                 }
+                break;
             }
         }
     }
