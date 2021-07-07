@@ -55,16 +55,26 @@ static cc_assignment_t g_assignments[MAX_ASSIGNMENTS];
 
 cc_assignment_t *cc_assignment_new(void)
 {
+#ifdef XC16
+    int i;
+#endif
     static int assignments_initialized;
     if (!assignments_initialized)
     {
+#ifdef XC16
+        for (i = 0; i < MAX_ASSIGNMENTS; i++)
+#else
         for (int i = 0; i < MAX_ASSIGNMENTS; i++)
+#endif
             g_assignments[i].id = -1;
 
         assignments_initialized = 1;
     }
-
+#ifdef XC16
+    for (i = 0; i < MAX_ASSIGNMENTS; i++)
+#else
     for (int i = 0; i < MAX_ASSIGNMENTS; i++)
+#endif
     {
         cc_assignment_t *assignment = &g_assignments[i];
 
@@ -81,7 +91,14 @@ cc_assignment_t *cc_assignment_new(void)
 
 int cc_assignment_delete(int assignment_id)
 {
+#ifdef XC16
+    int i;
+#endif
+#ifdef XC16
+    for (i = 0; i < MAX_ASSIGNMENTS; i++)
+#else
     for (int i = 0; i < MAX_ASSIGNMENTS; i++)
+#endif
     {
         cc_assignment_t *assignment = &g_assignments[i];
 

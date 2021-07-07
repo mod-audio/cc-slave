@@ -89,6 +89,9 @@ static cc_handle_t g_cc_handle;
 
 static void send(cc_handle_t *handle, const cc_msg_t *msg)
 {
+#ifdef XC16
+    uint32_t j;
+#endif
     uint8_t *buffer = handle->msg_tx->header;
 
     // header
@@ -103,7 +106,11 @@ static void send(cc_handle_t *handle, const cc_msg_t *msg)
     {
         if (msg != handle->msg_tx)
         {
+#ifdef XC16
+            for (j = 0; j < msg->data_size; j++)
+#else
             for (uint32_t j = 0; j < msg->data_size; j++)
+#endif
                 buffer[i++] = msg->data[j];
         }
         else

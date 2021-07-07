@@ -7,8 +7,12 @@
 #include "control_chain.h"
 #include "actuator.h"
 #include "update.h"
+#ifdef XC16
+extern float roundf(float);
+extern float fabsf(float);
+#else
 #include <math.h>
-
+#endif
 
 /*
 ****************************************************************************************************
@@ -304,8 +308,15 @@ cc_actuatorgroup_t *cc_actuatorgroup_new(cc_actuatorgroup_config_t *config)
 
 void cc_actuator_map(cc_assignment_t *assignment)
 {
+#ifdef XC16
+    uint8_t i;
+#endif
     // link assignment to actuator
+#ifdef XC16
+    for (i = 0; i < g_actuators_count; i++)
+#else
     for (uint8_t i = 0; i < g_actuators_count; i++)
+#endif
     {
         cc_actuator_t *actuator = &g_actuators[i];
         if (actuator->id == assignment->actuator_id)
@@ -319,7 +330,11 @@ void cc_actuator_map(cc_assignment_t *assignment)
     // initialize option list index
     if (assignment->mode & CC_MODE_OPTIONS)
     {
+#ifdef XC16
         for (int i = 0; i < assignment->list_count; i++)
+#else
+        for (int i = 0; i < assignment->list_count; i++)
+#endif
         {
             if (assignment->value == assignment->list_items[i]->value)
             {
@@ -333,7 +348,14 @@ void cc_actuator_map(cc_assignment_t *assignment)
 
 void cc_actuator_unmap(cc_assignment_t *assignment)
 {
+#ifdef XC16
+    uint8_t i;
+#endif
+#ifdef XC16
+    for (i = 0; i < g_actuators_count; i++)
+#else
     for (uint8_t i = 0; i < g_actuators_count; i++)
+#endif
     {
         cc_actuator_t *actuator = &g_actuators[i];
         if (actuator->id == assignment->actuator_id)
@@ -347,7 +369,14 @@ void cc_actuator_unmap(cc_assignment_t *assignment)
 
 void cc_actuators_process(void (*events_cb)(void *arg))
 {
+#ifdef XC16
+	uint8_t i;
+#endif
+#ifdef XC16
+    for (i = 0; i < g_actuators_count; i++)
+#else
     for (uint8_t i = 0; i < g_actuators_count; i++)
+#endif
     {
         cc_actuator_t *actuator = &g_actuators[i];
         cc_assignment_t *assignment = actuator->assignment;
