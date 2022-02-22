@@ -35,8 +35,12 @@
  *    - name (max 17 bytes)
  *    - supported modes bitmask (4 bytes)
  *    - number of max assignments (1 byte)
+  *  - actuator group count (1 byte)
+ *   - now per each actuator group:
+ *      - name (max 17 bytes)
+ *      - actuators in actuatorgroup (2 bytes)
  */
-#define TX_BUFFER_SIZE      64 + (24 * CC_MAX_DEVICES * CC_MAX_ACTUATORS)
+#define TX_BUFFER_SIZE      64 + (24 * CC_MAX_DEVICES * CC_MAX_ACTUATORS) + (CC_MAX_DEVICES * CC_MAX_ACTUATORGROUPS * 22)
 
 
 /*
@@ -308,6 +312,18 @@ static void parser(cc_handle_t *handle)
             cc_msg_builder(CC_CMD_SET_VALUE, 0, handle->msg_tx);
             send(handle, handle->msg_tx);
         }
+#ifdef CC_OPTIONS_LIST_SUPPORTED
+        else if (msg_rx->command == CC_CMD_UPDATE_ENUMERATION)
+        {
+            cc_update_enumeration_t update;
+            cc_msg_parser(msg_rx, &update);
+
+            cc_assignment_t *assignment = cc_assignment_update_enumeration(&update);
+            raise_event(handle, CC_EV_ENUM_UPDATE, assignment);
+
+            options_list_destroy(update.list_items);
+        }
+#endif
     }
 }
 
@@ -371,6 +387,15 @@ void cc_process(void)
     // process each actuator going through all assignments
     // data update messages will be queued and sent in the next frame
     cc_actuators_process(g_cc_handle.events_cb);
+}
+
+void cc_request_page(int page)
+{
+    cc_handle_t *handle = &g_cc_handle;
+
+    // build and send device descriptor message
+    cc_msg_builder(CC_CMD_REQUEST_CONTROL_PAGE, &page, handle->msg_tx);
+    send(handle, handle->msg_tx);
 }
 
 int cc_parse(const cc_data_t *received)

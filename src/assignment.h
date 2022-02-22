@@ -15,7 +15,6 @@ extern "C"
 #include <stdint.h>
 #include "utils.h"
 
-
 /*
 ****************************************************************************************************
 *       MACROS
@@ -31,7 +30,8 @@ extern "C"
 #define CC_MODE_LOGARITHMIC 0x040
 #define CC_MODE_COLOURED    0x100
 #define CC_MODE_MOMENTARY   0x200
-
+#define CC_MODE_REVERSE     0x400
+#define CC_MODE_GROUP       0x800
 
 /*
 ****************************************************************************************************
@@ -49,7 +49,7 @@ extern "C"
 typedef struct cc_assignment_t {
     int id, actuator_id;
     float value, min, max, def;
-    uint32_t mode;
+    uint16_t mode;
     uint16_t steps;
     uint8_t list_count;
 #ifndef CC_STRING_NOT_SUPPORTED
@@ -59,6 +59,12 @@ typedef struct cc_assignment_t {
 #endif
 } cc_assignment_t;
 
+typedef struct cc_update_enumeration_t {
+    int assignment_id;
+    int actuator_id;
+    int list_index;
+    option_t **list_items;
+} cc_update_enumeration_t;
 
 /*
 ****************************************************************************************************
@@ -72,6 +78,8 @@ cc_assignment_t *cc_assignment_new(void);
 int cc_assignment_delete(int assignment_id);
 // get the assignment with a specific id (can return null)
 cc_assignment_t *cc_assignment_get(int assignment_id);
+//update the list items of an assignment
+cc_assignment_t *cc_assignment_update_enumeration(cc_update_enumeration_t *update);
 // remove all assignments
 void cc_assignments_clear(void);
 

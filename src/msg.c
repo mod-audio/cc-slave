@@ -9,6 +9,7 @@
 #include "handshake.h"
 #include "device.h"
 #include "update.h"
+#include "assignment.h"
 
 
 /*
@@ -145,7 +146,6 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
         // read unit
         pdata += str16_deserialize(pdata, &assignment->unit);
 #endif
-
         // default value of list count
         assignment->list_count = 0;
 
@@ -153,15 +153,28 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
         // list count
         assignment->list_count = *pdata++;
 
-        // list items
-        assignment->list_items = options_list_create(assignment->list_count);
+        uint8_t list_items_in_frame = CC_OPTIONS_LIST_FRAME_SIZE;
+        if (assignment->list_count < list_items_in_frame)
+            list_items_in_frame = assignment->list_count;
 
-        for (int i = 0; i < assignment->list_count; i++)
+        // list items
+        assignment->list_items = options_list_create(list_items_in_frame);
+
+        for (int i = 0; i < list_items_in_frame; i++)
         {
             option_t *item = assignment->list_items[i];
 
             pdata += str16_deserialize(pdata, &item->label);
             pdata += bytes_to_float(pdata, &item->value);
+        }
+
+        for (int i = 0; i < list_items_in_frame; i++)
+        {
+            if (assignment->value == assignment->list_items[i]->value)
+            {
+                assignment->list_index = i;
+                break;
+            }
         }
 #endif
     }
@@ -182,7 +195,32 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
         // value to set
         bytes_to_float(pdata, &update->value);
     }
+#ifdef CC_OPTIONS_LIST_SUPPORTED
+    else if (msg->command == CC_CMD_UPDATE_ENUMERATION)
+    {
+        cc_update_enumeration_t *update = data_struct;
 
+        // assignment id, actuator id
+        update->assignment_id = *pdata++;
+        update->actuator_id = *pdata++;
+
+        cc_assignment_t *assignment = cc_assignment_get(update->assignment_id);
+        uint8_t list_items_in_frame = CC_OPTIONS_LIST_FRAME_SIZE;
+        if (assignment->list_count < list_items_in_frame)
+            list_items_in_frame = assignment->list_count;
+
+        update->list_index = *pdata++;
+
+        update->list_items = options_list_create(list_items_in_frame);
+        for (int i = 0; i < list_items_in_frame; i++)
+        {
+            option_t *item = update->list_items[i];
+
+            pdata += str16_deserialize(pdata, &item->label);
+            pdata += bytes_to_float(pdata, &item->value);
+        }
+    }
+#endif
     return 0;
 }
 
@@ -240,6 +278,31 @@ int cc_msg_builder(int command, const void *data_struct, cc_msg_t *msg)
             // max assignments
             *pdata++ = actuator->max_assignments;
         }
+
+        //number of actuatorgroups
+        *pdata++ = device->actuatorgroups_count;
+
+        //serialize actuatorgroups data
+        for (unsigned int i = 0; i < device->actuatorgroups_count; i++)
+        {
+            cc_actuatorgroup_t *actuatorgroup = device->actuatorgroups[i];
+
+            // actuatorgroup name
+            pdata += str16_serialize(&actuatorgroup->name, pdata);
+
+            // actuators in actuatorgroup
+            *pdata++ = actuatorgroup->actuators_in_group[0];
+            *pdata++ = actuatorgroup->actuators_in_group[1];
+        }
+
+        //amount of enumeration items we recieve at once
+        *pdata++ = CC_OPTIONS_LIST_FRAME_SIZE;
+
+        //amount of actuator pages
+        *pdata++ = device->actuator_pages;
+
+        //CC chain ID
+        *pdata++ = device->chain_id;
     }
     else if (command == CC_CMD_ASSIGNMENT || command == CC_CMD_UNASSIGNMENT || command == CC_CMD_SET_VALUE)
     {
@@ -266,6 +329,12 @@ int cc_msg_builder(int command, const void *data_struct, cc_msg_t *msg)
             *pdata++ = *pvalue++;
             *pdata++ = *pvalue++;
         }
+    }
+    else if (msg->command == CC_CMD_REQUEST_CONTROL_PAGE)
+    {
+        const int *page = data_struct;
+
+        *pdata++ = *page;
     }
     else
     {

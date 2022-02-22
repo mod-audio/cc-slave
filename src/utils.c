@@ -164,7 +164,7 @@ int str16_deserialize(const uint8_t *data, str16_t *str)
         if (str->size > 16)
             str->size = 16;
 
-        memcpy(str->text, (char *) data, str->size);
+        memcpy(str->text, data, str->size);
         str->text[str->size] = 0;
         written = str->size + 1;
     }
@@ -212,7 +212,11 @@ void options_list_destroy(option_t **list)
     if (list)
     {
         for (int i = 0; list[i]; i++)
+        {
             list[i]->label.size = 0;
+            memset(list[i]->label.text, 0, sizeof(list[i]->label.text));
+            list[i]->value = 0;
+        }
 
         free(list);
     }

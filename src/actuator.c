@@ -17,7 +17,7 @@
 */
 
 #define MAX_ACTUATORS   (CC_MAX_DEVICES * CC_MAX_ACTUATORS)
-
+#define MAX_ACTUATORGROUPS (CC_MAX_DEVICES * CC_MAX_ACTUATORGROUPS)
 
 /*
 ****************************************************************************************************
@@ -41,7 +41,8 @@
 
 static cc_actuator_t g_actuators[MAX_ACTUATORS];
 static unsigned int g_actuators_count;
-
+static cc_actuatorgroup_t g_actuatorgroups[MAX_ACTUATORGROUPS];
+static unsigned int g_actuatorgroups_count;
 
 /*
 ****************************************************************************************************
@@ -94,12 +95,28 @@ static int momentary_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
 #ifdef CC_OPTIONS_LIST_SUPPORTED
             if (assignment->mode & CC_MODE_OPTIONS)
             {
-                assignment->list_index++;
-
-                if (assignment->list_index >= assignment->list_count)
-                    assignment->list_index = 0;
-
-                assignment->value = assignment->list_items[assignment->list_index]->value;
+                if (assignment->mode & CC_MODE_REVERSE)
+                {
+                    if (assignment->list_index != 0) {
+                        assignment->list_index--;
+                        assignment->value = assignment->list_items[assignment->list_index]->value;
+                    }
+                    else
+                        return 0;
+                }
+                else
+                {
+                    if (assignment->list_index >= assignment->list_count-1) {
+                        if (assignment->mode & CC_MODE_GROUP)
+                            return 0;
+                        else
+                            assignment->value = 0;
+                    }
+                    else {
+                        assignment->list_index++;
+                        assignment->value = assignment->list_items[assignment->list_index]->value;
+                    }
+                }
 
                 return 1;
             }
@@ -165,9 +182,9 @@ static int continuos_process(cc_actuator_t *actuator, cc_assignment_t *assignmen
 #ifdef CC_OPTIONS_LIST_SUPPORTED
     else if (assignment->mode & CC_MODE_OPTIONS)
     {
-        float step = (actuator->max + actuator->min) / (float) assignment->list_count;
+        float step_size = (actuator->max + actuator->min) / (float) assignment->list_count;
 
-        assignment->list_index = actuator_value / step;
+        assignment->list_index = actuator_value / step_size;
 
         if (assignment->list_index >= assignment->list_count)
             assignment->list_index = assignment->list_count - 1;
@@ -243,6 +260,23 @@ cc_actuator_t *cc_actuator_new(cc_actuator_config_t *config)
     return actuator;
 }
 
+cc_actuatorgroup_t *cc_actuatorgroup_new(cc_actuatorgroup_config_t *config)
+{
+    if (g_actuatorgroups_count >= MAX_ACTUATORGROUPS)
+        return 0;
+
+    cc_actuatorgroup_t *actuatorgroup = &g_actuatorgroups[g_actuatorgroups_count];
+
+    //initialize actuatorgroup data struct
+    actuatorgroup->actuators_in_group[0] = config->actuator_1;
+    actuatorgroup->actuators_in_group[1] = config->actuator_2;
+    str16_create(config->name, &actuatorgroup->name);
+
+    g_actuatorgroups_count++;
+
+    return actuatorgroup;
+}
+
 void cc_actuator_map(cc_assignment_t *assignment)
 {
     // link assignment to actuator
@@ -255,21 +289,6 @@ void cc_actuator_map(cc_assignment_t *assignment)
             break;
         }
     }
-
-#ifdef CC_OPTIONS_LIST_SUPPORTED
-    // initialize option list index
-    if (assignment->mode & CC_MODE_OPTIONS)
-    {
-        for (int i = 0; i < assignment->list_count; i++)
-        {
-            if (assignment->value == assignment->list_items[i]->value)
-            {
-                assignment->list_index = i;
-                break;
-            }
-        }
-    }
-#endif
 }
 
 void cc_actuator_unmap(cc_assignment_t *assignment)

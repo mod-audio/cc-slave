@@ -24,7 +24,6 @@
 #define VERSION2_STR(a,b)   STR(a) "." STR(b)
 #define VERSION3_STR(a,b,c) STR(a) "." STR(b) "." STR(c)
 
-
 /*
 ****************************************************************************************************
 *       CONFIGURATION

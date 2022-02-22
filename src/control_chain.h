@@ -24,7 +24,7 @@ extern "C"
 
 // protocol version
 #define CC_PROTOCOL_MAJOR       0
-#define CC_PROTOCOL_MINOR       6
+#define CC_PROTOCOL_MINOR       7
 
 // define serial communication baud rate and frame period
 #define CC_BAUD_RATE        500000      // in bps
@@ -85,6 +85,9 @@ extern "C"
 // options list supported
 #if CC_MAX_OPTIONS_ITEMS > 0
 #define CC_OPTIONS_LIST_SUPPORTED
+#ifndef CC_OPTIONS_LIST_FRAME_SIZE
+#define CC_OPTIONS_LIST_FRAME_SIZE 5
+#endif
 #endif
 
 // fallback option for serial baud rate
@@ -116,7 +119,7 @@ typedef struct cc_event_t {
 } cc_event_t;
 
 enum {CC_EV_HANDSHAKE_FAILED, CC_EV_ASSIGNMENT, CC_EV_UNASSIGNMENT, CC_EV_UPDATE,
-      CC_EV_DEVICE_DISABLED, CC_EV_MASTER_RESETED};
+      CC_EV_ENUM_UPDATE, CC_EV_DEVICE_DISABLED, CC_EV_MASTER_RESETED};
 
 
 /*
@@ -127,6 +130,7 @@ enum {CC_EV_HANDSHAKE_FAILED, CC_EV_ASSIGNMENT, CC_EV_UNASSIGNMENT, CC_EV_UPDATE
 
 void cc_init(void (*response_cb)(void *arg), void (*events_cb)(void *arg));
 void cc_process(void);
+void cc_request_page(int page);
 int cc_parse(const cc_data_t *received);
 
 

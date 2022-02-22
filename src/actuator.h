@@ -47,6 +47,11 @@ typedef struct cc_actuator_config_t {
     int max_assignments;
 } cc_actuator_config_t;
 
+typedef struct cc_actuatorgroup_config_t {
+    const char *name;
+    int actuator_1, actuator_2;
+} cc_actuatorgroup_config_t;
+
 typedef struct cc_actuator_t {
     int id, type, lock;
     str16_t name;
@@ -57,6 +62,10 @@ typedef struct cc_actuator_t {
     cc_assignment_t *assignment;
 } cc_actuator_t;
 
+typedef struct cc_actuatorgroup_t {
+    str16_t name;
+    int actuators_in_group[2];
+} cc_actuatorgroup_t;
 
 /*
 ****************************************************************************************************
@@ -66,6 +75,8 @@ typedef struct cc_actuator_t {
 
 // create a new actuator object
 cc_actuator_t *cc_actuator_new(cc_actuator_config_t *config);
+// create new actuatorgroup object
+cc_actuatorgroup_t *cc_actuatorgroup_new(cc_actuatorgroup_config_t *config);
 // map assignment to actuator
 void cc_actuator_map(cc_assignment_t *assignment);
 // unmap assignment from actuator
