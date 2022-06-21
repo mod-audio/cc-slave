@@ -115,30 +115,6 @@ cc_assignment_t *cc_assignment_get(int assignment_id)
     return NULL;
 }
 
-#ifdef CC_OPTIONS_LIST_SUPPORTED
-cc_assignment_t *cc_assignment_update_enumeration(cc_update_enumeration_t *update)
-{
-    //first free old list memory
-    cc_assignment_t *assignment = cc_assignment_get(update->assignment_id);
-
-    uint8_t list_items_in_frame = CC_OPTIONS_LIST_FRAME_SIZE;
-    if (assignment->list_count < list_items_in_frame)
-        list_items_in_frame = assignment->list_count;
-
-    for (int i = 0; i < list_items_in_frame; i++)
-    {
-        assignment->list_items[i]->label.size = update->list_items[i]->label.size;
-        assignment->list_items[i]->value = update->list_items[i]->value;
-        strcpy(assignment->list_items[i]->label.text, update->list_items[i]->label.text);
-    }
-
-    //set the indexes
-    assignment->list_index = update->list_index;
-
-    return assignment;
-}
-#endif
-
 inline void cc_assignments_clear(void)
 {
     cc_assignment_delete(-1);

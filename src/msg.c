@@ -198,27 +198,34 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
 #ifdef CC_OPTIONS_LIST_SUPPORTED
     else if (msg->command == CC_CMD_UPDATE_ENUMERATION)
     {
-        cc_update_enumeration_t *update = data_struct;
-
         // assignment id, actuator id
-        update->assignment_id = *pdata++;
-        update->actuator_id = *pdata++;
+        uint8_t *assignment_id = data_struct;
 
-        cc_assignment_t *assignment = cc_assignment_get(update->assignment_id);
+        *assignment_id = *pdata++;
+        uint8_t actuator_id = *pdata++;
+
+        cc_assignment_t *assignment = cc_assignment_get(*assignment_id);
         uint8_t list_items_in_frame = CC_OPTIONS_LIST_FRAME_SIZE;
         if (assignment->list_count < list_items_in_frame)
             list_items_in_frame = assignment->list_count;
 
-        update->list_index = *pdata++;
+        uint8_t list_index = *pdata++;
 
-        update->list_items = options_list_create(list_items_in_frame);
+        //free old list
+        options_list_destroy(assignment->list_items);
+
+        //create a new one
+        assignment->list_items = options_list_create(list_items_in_frame);
+
         for (int i = 0; i < list_items_in_frame; i++)
         {
-            option_t *item = update->list_items[i];
+            option_t *item = assignment->list_items[i];
 
             pdata += str16_deserialize(pdata, &item->label);
             pdata += bytes_to_float(pdata, &item->value);
         }
+
+        assignment->list_index = list_index;
     }
 #endif
     return 0;

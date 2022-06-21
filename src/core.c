@@ -23,7 +23,7 @@
 
 #define I_AM_ALIVE_PERIOD   50      // in sync cycles
 
-#define RX_BUFFER_SIZE      64 + (CC_MAX_OPTIONS_ITEMS * 20)
+#define RX_BUFFER_SIZE      (64 + (CC_MAX_OPTIONS_ITEMS * 20)) * CC_MAX_ACTUATORS
 
 /* NOTE TX buffer needs to be able to contain the entire device descriptor
  * The entire buffer consists of:
@@ -287,9 +287,6 @@ static void parser(cc_handle_t *handle)
 
             cc_actuator_map(assignment);
             raise_event(handle, CC_EV_ASSIGNMENT, assignment);
-
-            cc_msg_builder(CC_CMD_ASSIGNMENT, 0, handle->msg_tx);
-            send(handle, handle->msg_tx);
         }
         else if (msg_rx->command == CC_CMD_UNASSIGNMENT)
         {
@@ -315,13 +312,11 @@ static void parser(cc_handle_t *handle)
 #ifdef CC_OPTIONS_LIST_SUPPORTED
         else if (msg_rx->command == CC_CMD_UPDATE_ENUMERATION)
         {
-            cc_update_enumeration_t update;
-            cc_msg_parser(msg_rx, &update);
+            uint8_t assignment_id;
+            cc_msg_parser(msg_rx, &assignment_id);
 
-            cc_assignment_t *assignment = cc_assignment_update_enumeration(&update);
+            cc_assignment_t *assignment = cc_assignment_get(assignment_id);
             raise_event(handle, CC_EV_ENUM_UPDATE, assignment);
-
-            options_list_destroy(update.list_items);
         }
 #endif
     }
@@ -392,6 +387,9 @@ void cc_process(void)
 void cc_request_page(int page)
 {
     cc_handle_t *handle = &g_cc_handle;
+
+    //first clear all assignments
+    cc_assignment_delete(-1);
 
     // build and send device descriptor message
     cc_msg_builder(CC_CMD_REQUEST_CONTROL_PAGE, &page, handle->msg_tx);
