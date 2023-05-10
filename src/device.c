@@ -7,6 +7,8 @@
 #include "control_chain.h"
 #include "device.h"
 
+#include <stddef.h>
+
 
 /*
 ****************************************************************************************************
@@ -69,7 +71,11 @@ cc_device_t *cc_device_new(const char *name, const char *uri)
     device->actuators_count = 0;
 
     // create a list of actuatorgroups
-    device->actuatorgroups = &g_actuatorgroups[g_devices_count * CC_MAX_ACTUATORGROUPS];
+    if (CC_MAX_ACTUATORGROUPS != 0) {
+        device->actuatorgroups = &g_actuatorgroups[g_devices_count * CC_MAX_ACTUATORGROUPS];
+    } else {
+        device->actuatorgroups = NULL;
+    }
     device->actuatorgroups_count = 0;
 
     g_devices_count++;
@@ -86,6 +92,7 @@ void cc_device_actuator_add(cc_device_t *device, cc_actuator_t *actuator)
     device->actuators_count++;
 }
 
+#if MAX_ACTUATORGROUPS != 0
 void cc_device_actuatorgroup_add(cc_device_t *device, cc_actuatorgroup_t *actuatorgroup)
 {
     if (device->actuatorgroups_count >= CC_MAX_ACTUATORGROUPS)
@@ -94,6 +101,7 @@ void cc_device_actuatorgroup_add(cc_device_t *device, cc_actuatorgroup_t *actuat
     device->actuatorgroups[device->actuatorgroups_count] = actuatorgroup;
     device->actuatorgroups_count++;
 }
+#endif
 
 cc_actuator_t *cc_device_actuator_get(cc_device_t *device, uint8_t actuator_id)
 {

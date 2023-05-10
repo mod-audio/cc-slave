@@ -41,8 +41,10 @@
 
 static cc_actuator_t g_actuators[MAX_ACTUATORS];
 static unsigned int g_actuators_count;
+#if MAX_ACTUATORGROUPS != 0
 static cc_actuatorgroup_t g_actuatorgroups[MAX_ACTUATORGROUPS];
 static unsigned int g_actuatorgroups_count;
+#endif
 
 /*
 ****************************************************************************************************
@@ -260,6 +262,7 @@ cc_actuator_t *cc_actuator_new(cc_actuator_config_t *config)
     return actuator;
 }
 
+#if MAX_ACTUATORGROUPS != 0
 cc_actuatorgroup_t *cc_actuatorgroup_new(cc_actuatorgroup_config_t *config)
 {
     if (g_actuatorgroups_count >= MAX_ACTUATORGROUPS)
@@ -276,6 +279,7 @@ cc_actuatorgroup_t *cc_actuatorgroup_new(cc_actuatorgroup_config_t *config)
 
     return actuatorgroup;
 }
+#endif
 
 void cc_actuator_map(cc_assignment_t *assignment)
 {
