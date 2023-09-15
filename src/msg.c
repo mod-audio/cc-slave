@@ -146,6 +146,7 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
         // read unit
         pdata += str16_deserialize(pdata, &assignment->unit);
 #endif
+
         // default value of list count
         assignment->list_count = 0;
 
@@ -286,7 +287,7 @@ int cc_msg_builder(int command, const void *data_struct, cc_msg_t *msg)
             *pdata++ = actuator->max_assignments;
         }
 
-        //number of actuatorgroups
+        // number of actuatorgroups
         *pdata++ = device->actuatorgroups_count;
 
         //serialize actuatorgroups data
@@ -302,13 +303,13 @@ int cc_msg_builder(int command, const void *data_struct, cc_msg_t *msg)
             *pdata++ = actuatorgroup->actuators_in_group[1];
         }
 
-        //amount of enumeration items we recieve at once
+        // amount of enumeration items we recieve at once
         *pdata++ = CC_OPTIONS_LIST_FRAME_SIZE;
 
-        //amount of actuator pages
+        // amount of actuator pages
         *pdata++ = device->actuator_pages;
 
-        //CC chain ID
+        // CC chain ID
         *pdata++ = device->chain_id;
     }
     else if (command == CC_CMD_ASSIGNMENT || command == CC_CMD_UNASSIGNMENT || command == CC_CMD_SET_VALUE)
