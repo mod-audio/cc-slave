@@ -155,13 +155,13 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
         assignment->list_count = *pdata++;
 
         uint8_t list_items_in_frame = CC_OPTIONS_LIST_FRAME_SIZE;
-        if (assignment->list_count < list_items_in_frame)
+        if (list_items_in_frame > assignment->list_count)
             list_items_in_frame = assignment->list_count;
 
         // list items
         assignment->list_items = options_list_create(list_items_in_frame);
 
-        for (int i = 0; i < list_items_in_frame; i++)
+        for (int i = 0; i < assignment->list_count; i++)
         {
             option_t *item = assignment->list_items[i];
 
@@ -169,7 +169,7 @@ int cc_msg_parser(const cc_msg_t *msg, void *data_struct)
             pdata += bytes_to_float(pdata, &item->value);
         }
 
-        for (int i = 0; i < list_items_in_frame; i++)
+        for (int i = 0; i < assignment->list_count; i++)
         {
             if (assignment->value == assignment->list_items[i]->value)
             {
