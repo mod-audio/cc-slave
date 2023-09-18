@@ -131,23 +131,24 @@ static void send(cc_handle_t *handle, const cc_msg_t *msg)
 
 static void raise_event(cc_handle_t *handle, int event_id, void *data)
 {
-    static cc_event_t event;
+    if (!handle->events_cb)
+        return;
 
-    if (handle->events_cb)
-    {
-        event.id = event_id;
-        event.data = data;
-        handle->events_cb(&event);
-    }
+    cc_event_t event = {
+        .id = event_id,
+        .data = data,
+    };
+
+    handle->events_cb(&event);
 }
 
 static void parser(cc_handle_t *handle)
 {
-    cc_msg_t *msg_rx = handle->msg_rx;
-
     cc_device_t *device = cc_device_get();
     if (!device)
         return;
+
+    cc_msg_t *msg_rx = handle->msg_rx;
 
     // check if it's setup cycle
     int sync_cycle = msg_rx->data[0];
