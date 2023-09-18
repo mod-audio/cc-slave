@@ -81,6 +81,8 @@ typedef struct cc_handle_t {
 
 static cc_handle_t g_cc_handle;
 
+static int g_next_actuator_page = -1;
+
 
 /*
 ****************************************************************************************************
@@ -260,11 +262,22 @@ static void parser(cc_handle_t *handle)
     }
     else if (handle->comm_state == LISTENING_REQUESTS)
     {
-        if (msg_rx->command == CC_CMD_CHAIN_SYNC && sync_cycle == CC_SYNC_REGULAR_CYCLE)
+        if (msg_rx->command == CC_CMD_CHAIN_SYNC)
         {
-            // device id is used to define the communication frame
-            // timer is reseted each regular sync message
-            timer_set(handle->device_id * CC_FRAME_PERIOD);
+            if (sync_cycle == CC_SYNC_REGULAR_CYCLE)
+            {
+                // device id is used to define the communication frame
+                // timer is reseted each regular sync message
+                timer_set(handle->device_id * CC_FRAME_PERIOD);
+            }
+            else if (g_next_actuator_page != -1)
+            {
+                // build and send device descriptor message
+                int page = g_next_actuator_page;
+                g_next_actuator_page = -1;
+                cc_msg_builder(CC_CMD_REQUEST_CONTROL_PAGE, &page, handle->msg_tx);
+                send(handle, handle->msg_tx);
+            }
         }
         else if (msg_rx->command == CC_CMD_DEV_CONTROL)
         {
@@ -325,10 +338,10 @@ static void parser(cc_handle_t *handle)
 
 static void timer_callback(void)
 {
-    cc_handle_t *handle = &g_cc_handle;
     static unsigned int sync_counter;
 
-    static uint8_t chain_sync_msg_data = CC_SYNC_REGULAR_CYCLE;
+    cc_handle_t *handle = &g_cc_handle;
+    uint8_t chain_sync_msg_data = CC_SYNC_REGULAR_CYCLE;
     const cc_msg_t chain_sync_msg = {
         .device_id = handle->device_id,
         .command = CC_CMD_CHAIN_SYNC,
@@ -387,14 +400,11 @@ void cc_process(void)
 
 void cc_request_page(int page)
 {
-    cc_handle_t *handle = &g_cc_handle;
+    // first clear all assignments
+    cc_assignments_clear();
 
-    //first clear all assignments
-    cc_assignment_delete(-1);
-
-    // build and send device descriptor message
-    cc_msg_builder(CC_CMD_REQUEST_CONTROL_PAGE, &page, handle->msg_tx);
-    send(handle, handle->msg_tx);
+    // set flag to be processed later
+    g_next_actuator_page = page;
 }
 
 int cc_parse(const cc_data_t *received)

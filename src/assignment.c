@@ -115,7 +115,7 @@ cc_assignment_t *cc_assignment_get(int assignment_id)
     return NULL;
 }
 
-inline void cc_assignments_clear(void)
+void cc_assignments_clear(void)
 {
     cc_assignment_delete(-1);
 }
